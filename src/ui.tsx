@@ -29,9 +29,9 @@ export function PageHead({
   return (
     <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-mute dark:text-white/45">{kicker}</div>
-        <h1 className="mt-1 text-[28px] font-semibold tracking-tight text-ink dark:text-white">{title}</h1>
-        <p className="mt-1 max-w-2xl text-[13px] text-mute dark:text-white/55">{note}</p>
+        <div className="text-[10px] font-semibold uppercase tracking-wide text-mute">{kicker}</div>
+        <h1 className="mt-1 text-[28px] font-semibold text-ink">{title}</h1>
+        <p className="mt-1 max-w-2xl text-[13px] text-mute">{note}</p>
       </div>
       <ExportBtn />
     </div>
@@ -44,7 +44,7 @@ export function ExportBtn() {
     <button
       type="button"
       onClick={runExport}
-      className="flex h-8 items-center gap-1.5 rounded-lg border border-[#e4e6e4] bg-white px-2.5 text-[12px] font-medium text-ink dark:border-white/10 dark:bg-white/5 dark:text-white"
+      className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] font-medium text-ink"
     >
       Export
     </button>
@@ -52,7 +52,7 @@ export function ExportBtn() {
 }
 
 export function ScopeLine({ text }: { text: string }) {
-  return <p className="mb-4 text-[12px] text-mute dark:text-white/45">{text}</p>
+  return <p className="mb-4 text-[12px] text-mute">{text}</p>
 }
 
 export function Alert({
@@ -70,12 +70,12 @@ export function Alert({
   return (
     <Link
       to={to}
-      className="flex gap-3 rounded-2xl border border-line bg-white p-4 hover:border-ink/20 dark:border-white/10 dark:bg-[#0c1f18] dark:hover:border-white/20"
+      className="flex gap-3 rounded-2xl border border-line bg-card p-4 hover:border-ink/20"
     >
       <i className={`mt-1 h-8 w-1 rounded-full ${bar}`} />
       <div>
-        <div className="text-[15px] font-semibold text-ink dark:text-white">{title}</div>
-        <p className="mt-1 text-[12px] text-mute dark:text-white/50">{body}</p>
+        <div className="text-[15px] font-semibold text-ink">{title}</div>
+        <p className="mt-1 text-[12px] text-mute">{body}</p>
       </div>
     </Link>
   )
@@ -93,23 +93,23 @@ export function Kpi({
   tone?: 'rose' | 'ok'
 }) {
   return (
-    <div className="rounded-2xl border border-line bg-white p-4 dark:border-white/10 dark:bg-[#0c1f18]">
-      <div className="text-[11px] font-medium uppercase tracking-[0.08em] text-mute dark:text-white/45">{label}</div>
+    <div className="rounded-2xl border border-line bg-card p-4">
+      <div className="text-[11px] font-medium uppercase tracking-wide text-mute">{label}</div>
       <div
-        className={`num mt-2 text-[26px] font-semibold tracking-tight ${
-          tone === 'rose' ? 'text-rose' : tone === 'ok' ? 'text-green' : 'text-ink dark:text-white'
+        className={`num mt-2 text-[26px] font-semibold ${
+          tone === 'rose' ? 'text-rose' : tone === 'ok' ? 'text-green' : 'text-ink'
         }`}
       >
         {value}
       </div>
-      {note && <div className="mt-1 text-[12px] text-mute dark:text-white/50">{note}</div>}
+      {note && <div className="mt-1 text-[12px] text-mute">{note}</div>}
     </div>
   )
 }
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-line bg-white p-5 dark:border-white/10 dark:bg-[#0c1f18] ${className}`}>
+    <div className={`rounded-2xl border border-line bg-card p-5 ${className}`}>
       {children}
     </div>
   )
@@ -118,8 +118,8 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
 export function H({ title, hint }: { title: string; hint?: string }) {
   return (
     <div className="mb-4">
-      <h2 className="text-[15px] font-semibold text-ink dark:text-white">{title}</h2>
-      {hint && <p className="mt-0.5 text-[12px] text-mute dark:text-white/45">{hint}</p>}
+      <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
+      {hint && <p className="mt-0.5 text-[12px] text-mute">{hint}</p>}
     </div>
   )
 }
@@ -136,17 +136,17 @@ export function Banner({
   onAction?: () => void
 }) {
   return (
-    <div className="mb-4 rounded-2xl border border-line bg-white p-4 dark:border-white/10 dark:bg-[#0c1f18]">
+    <div className="mb-4 rounded-2xl border border-line bg-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-[13px] font-semibold text-ink dark:text-white">{title}</div>
-          <p className="mt-1 max-w-3xl text-[12px] text-mute dark:text-white/50">{body}</p>
+          <div className="text-[13px] font-semibold text-ink">{title}</div>
+          <p className="mt-1 max-w-3xl text-[12px] text-mute">{body}</p>
         </div>
         {action && (
           <button
             type="button"
             onClick={onAction}
-            className="h-8 rounded-lg border border-line px-3 text-[12px] font-medium dark:border-white/15 dark:text-white"
+            className="h-8 rounded-lg border border-line px-3 text-[12px] font-medium text-ink"
           >
             {action}
           </button>
@@ -166,16 +166,14 @@ export function Tabs({
   onChange: (id: string) => void
 }) {
   return (
-    <div className="mb-5 flex flex-wrap gap-1 rounded-xl bg-black/[0.06] p-1 dark:bg-white/10">
+    <div className="mb-5 flex flex-wrap gap-1 rounded-xl bg-black/5 p-1 dark:bg-white/10">
       {items.map((t) => (
         <button
           key={t.id}
           type="button"
           onClick={() => onChange(t.id)}
           className={`h-8 rounded-lg px-3 text-[13px] font-medium ${
-            value === t.id
-              ? 'bg-white text-ink shadow-sm dark:bg-white dark:text-[#03160f]'
-              : 'text-ink/70 hover:text-ink dark:text-white/70 dark:hover:text-white'
+            value === t.id ? 'bg-card text-ink shadow-sm' : 'text-mute hover:text-ink'
           }`}
         >
           {t.label}
@@ -193,7 +191,7 @@ export function Pill({ children, tone = 'mute' }: { children: ReactNode; tone?: 
         ? 'bg-amber/10 text-amber'
         : tone === 'bad'
           ? 'bg-rose/10 text-rose'
-          : 'bg-black/5 text-mute dark:bg-white/10 dark:text-white/60'
+          : 'bg-black/5 text-mute dark:bg-white/10'
   return <span className={`inline-flex h-6 items-center rounded-full px-2 text-[11px] font-semibold ${c}`}>{children}</span>
 }
 
@@ -210,7 +208,7 @@ export function Table({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[640px] text-left text-[13px]">
         <thead>
-          <tr className="text-[10px] font-semibold uppercase tracking-[0.1em] text-mute dark:text-white/40">
+          <tr className="text-[10px] font-semibold uppercase tracking-wide text-mute">
             {cols.map((c) => (
               <th key={c} className="pb-2 pr-3 font-semibold">
                 {c}
@@ -222,7 +220,7 @@ export function Table({
           {rows.map((row, i) => (
             <tr key={i} className="border-t border-line dark:border-white/8">
               {row.map((cell, j) => (
-                <td key={j} className="py-2.5 pr-3 text-ink dark:text-white/80">
+                <td key={j} className="py-2.5 pr-3 text-ink">
                   {cell}
                 </td>
               ))}

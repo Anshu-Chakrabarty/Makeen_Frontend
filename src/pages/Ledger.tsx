@@ -56,7 +56,7 @@ export function Ledger() {
               setParams(n, { replace: true })
             }}
             className={`h-8 rounded-lg px-3 text-[12px] font-semibold ${
-              kind === k ? 'bg-side text-white' : 'border border-line bg-white text-ink dark:border-white/10 dark:bg-white/5 dark:text-white'
+              kind === k ? 'bg-side text-white' : 'border border-line bg-card text-ink'
             }`}
           >
             {k} · {counts[k] ?? 0}

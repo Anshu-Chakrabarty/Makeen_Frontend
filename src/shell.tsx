@@ -154,26 +154,45 @@ function options(key: keyof Filters) {
 
 function Chip({ field, label }: { field: keyof Filters; label: string }) {
   const { filters, set } = useFilters()
+  const [open, setOpen] = useState(false)
   const opts = options(field)
   const current = opts.find((o) => o.value === filters[field])?.label ?? filters[field]
   return (
-    <label className="relative flex h-8 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 text-[12px] dark:border-white/10 dark:bg-white/5">
-      <span className="text-mute">{label}</span>
-      <span className="font-medium text-ink dark:text-white">{current}</span>
-      <span className="scale-75 text-mute">{ic.chev}</span>
-      <select
+    <div className="relative">
+      <button
+        type="button"
         aria-label={label}
-        className="absolute inset-0 cursor-pointer opacity-0 text-ink bg-white dark:text-white dark:bg-[#0c1f18]"
-        value={filters[field]}
-        onChange={(e) => set(field, e.target.value)}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] text-ink"
       >
-        {opts.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-    </label>
+        <span className="text-mute">{label}</span>
+        <span className="font-medium">{current}</span>
+        <span className="scale-75 text-mute">{ic.chev}</span>
+      </button>
+      {open && (
+        <>
+          <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-9 z-50 max-h-72 min-w-full overflow-auto rounded-lg border border-line bg-card py-1 shadow-lg">
+            {opts.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className={`block w-full px-3 py-1.5 text-left text-[13px] text-ink hover:bg-black/5 dark:hover:bg-white/10 ${
+                  o.value === filters[field] ? 'bg-black/5 font-semibold dark:bg-white/10' : ''
+                }`}
+                onClick={() => {
+                  set(field, o.value)
+                  setOpen(false)
+                }}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   )
 }
 
@@ -215,7 +234,7 @@ export function Shell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f5f6] text-ink dark:bg-[#071511] dark:text-white">
+    <div className="min-h-screen bg-paper text-ink">
       {open && <button className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={() => setOpen(false)} />}
 
       <aside className={`fixed inset-y-0 left-0 z-40 flex w-[256px] flex-col bg-[#03160f] text-white ${open ? 'flex' : 'hidden'} lg:flex`}>
@@ -271,14 +290,14 @@ export function Shell() {
       </aside>
 
       <div className="lg:pl-[256px]">
-        <header className="sticky top-0 z-20 border-b border-[#e8eae8] bg-white dark:border-white/8 dark:bg-[#0a1914]">
+        <header className="sticky top-0 z-20 border-b border-line bg-card">
           <div className="flex h-12 items-center gap-3 px-4">
             <button type="button" className="lg:hidden" onClick={() => setOpen(true)}>
               {ic.orders}
             </button>
             <div className="text-[13px] text-mute">
               {crumb[0]} <span className="mx-1 text-[#d4d6d4]">/</span>
-              <span className="text-ink dark:text-white">{crumb[1]}</span>
+              <span className="text-ink">{crumb[1]}</span>
             </div>
             <div className="relative ml-auto flex items-center gap-2">
               <label className="relative hidden md:block">
@@ -291,15 +310,15 @@ export function Shell() {
                   }}
                   onFocus={() => setShowSearch(true)}
                   placeholder="Search pages"
-                  className="h-8 w-48 rounded-lg border border-[#e4e6e4] bg-[#f6f7f6] pl-8 pr-3 text-[12px] outline-none placeholder:text-mute dark:border-white/10 dark:bg-white/5"
+                  className="h-8 w-48 rounded-lg border border-line bg-paper px-3 pl-8 text-[12px] text-ink outline-none placeholder:text-mute"
                 />
                 {showSearch && hits.length > 0 && (
-                  <div className="absolute left-0 top-9 z-30 w-64 rounded-lg border border-line bg-white py-1 shadow-lg dark:border-white/10 dark:bg-[#0c1f18]">
+                  <div className="absolute left-0 top-9 z-30 w-64 rounded-lg border border-line bg-card py-1 shadow-lg">
                     {hits.map((h) => (
                       <button
                         key={h.to}
                         type="button"
-                        className="block w-full px-3 py-2 text-left text-[13px] hover:bg-black/5 dark:hover:bg-white/10"
+                        className="block w-full px-3 py-2 text-left text-[13px] text-ink hover:bg-black/5 dark:hover:bg-white/10"
                         onClick={() => {
                           navTo(h.to)
                           setQ('')
@@ -315,7 +334,7 @@ export function Shell() {
               <button
                 type="button"
                 onClick={() => setShowFx((v) => !v)}
-                className="hidden items-center gap-1.5 rounded-full border border-[#e4e6e4] bg-white px-2.5 py-1 text-[11px] text-mute sm:flex dark:border-white/10 dark:bg-white/5"
+                className="hidden items-center gap-1.5 rounded-full border border-line bg-card px-2.5 py-1 text-[11px] text-mute sm:flex"
               >
                 <i className="h-1.5 w-1.5 rounded-full bg-[#1b8a43]" />
                 Vena · {filters.year} · {periods.find((p) => p.value === filters.period)?.label} · rate ₹{rates.Jul}=€1
@@ -324,7 +343,7 @@ export function Shell() {
               <div className="relative">
                 <IconBtn onClick={() => setShowBell((v) => !v)}>{ic.bell}</IconBtn>
                 {showBell && (
-                  <div className="absolute right-0 top-9 z-30 w-72 rounded-lg border border-line bg-white p-2 shadow-lg dark:border-white/10 dark:bg-[#0c1f18]">
+                  <div className="absolute right-0 top-9 z-30 w-72 rounded-lg border border-line bg-card p-2 shadow-lg">
                     {[
                       { to: '/ledger', t: 'April EBITDA −15%', d: 'Open ledger exceptions' },
                       { to: '/receivables', t: '₹8.1 Cr older than 180', d: 'Open ageing' },
@@ -333,7 +352,7 @@ export function Shell() {
                       <button
                         key={n.to}
                         type="button"
-                        className="block w-full rounded-md px-2 py-2 text-left hover:bg-black/5 dark:hover:bg-white/10"
+                        className="block w-full rounded-md px-2 py-2 text-left text-ink hover:bg-black/5 dark:hover:bg-white/10"
                         onClick={() => {
                           navTo(n.to)
                           setShowBell(false)
@@ -349,14 +368,14 @@ export function Shell() {
               <button
                 type="button"
                 onClick={runExport}
-                className="hidden h-8 items-center gap-1.5 rounded-lg border border-[#e4e6e4] px-2.5 text-[12px] font-medium text-ink sm:flex dark:border-white/10 dark:text-white"
+                className="hidden h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] font-medium text-ink sm:flex"
               >
                 {ic.export} Export
               </button>
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#03160f] text-[11px] font-semibold text-white">A</div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 border-t border-[#eef0ee] px-4 py-2 dark:border-white/6">
+          <div className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-2">
             {chips.map((c) => (
               <Chip key={c.key} field={c.key} label={c.label} />
             ))}
@@ -368,7 +387,7 @@ export function Shell() {
                 Saved views
               </button>
               {showViews && (
-                <div className="absolute right-28 top-9 z-30 w-56 rounded-lg border border-line bg-white p-2 shadow-lg dark:border-white/10 dark:bg-[#0c1f18]">
+                <div className="absolute right-28 top-9 z-30 w-56 rounded-lg border border-line bg-card p-2 shadow-lg">
                   <button type="button" onClick={saveView} className="mb-1 w-full rounded-md bg-[#1b8a43] px-2 py-1.5 text-left text-[12px] text-white">
                     Save current slice
                   </button>
@@ -392,21 +411,21 @@ export function Shell() {
               <button
                 type="button"
                 onClick={() => setShowFilters((v) => !v)}
-                className="flex h-8 items-center gap-1.5 rounded-lg border border-[#e4e6e4] px-2.5 text-[12px] font-medium dark:border-white/10"
+                className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] font-medium text-ink"
               >
                 {ic.sliders} Filters
               </button>
             </div>
           </div>
           {showFilters && (
-            <div className="grid gap-3 border-t border-[#eef0ee] px-4 py-3 sm:grid-cols-3 lg:grid-cols-6 dark:border-white/6">
+            <div className="grid gap-3 border-t border-line px-4 py-3 sm:grid-cols-3 lg:grid-cols-6">
               {chipsByPath['/'].concat(chipsByPath['/working-capital'], chipsByPath['/contracts']).map((c) => (
                 <Chip key={`all-${c.key}`} field={c.key} label={c.label} />
               ))}
             </div>
           )}
           {showFx && (
-            <div className="flex flex-wrap items-center gap-3 border-t border-[#eef0ee] px-4 py-3 text-[12px] dark:border-white/6">
+            <div className="flex flex-wrap items-center gap-3 border-t border-line px-4 py-3 text-[12px] text-ink">
               <span className="text-mute">Monthly INR per €1 — convert each month, then add for YTD. Sample until the client files the official rate.</span>
               {Object.entries(rates).map(([m, r]) => (
                 <label key={m} className="flex items-center gap-1">
@@ -416,7 +435,7 @@ export function Shell() {
                     step="0.1"
                     value={r}
                     onChange={(e) => setRate(m, Number(e.target.value) || r)}
-                    className="h-8 w-16 rounded-lg border border-line px-2 num dark:border-white/10 dark:bg-white/5"
+                    className="h-8 w-16 rounded-lg border border-line bg-card px-2 text-ink num"
                   />
                 </label>
               ))}
@@ -481,7 +500,7 @@ function IconBtn({ children, onClick }: { children: ReactNode; onClick?: () => v
     <button
       type="button"
       onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#e4e6e4] text-mute hover:text-ink dark:border-white/10 dark:hover:text-white"
+      className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-card text-mute hover:text-ink"
     >
       {children}
     </button>
