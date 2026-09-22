@@ -163,7 +163,7 @@ function Chip({ field, label }: { field: keyof Filters; label: string }) {
       <span className="scale-75 text-mute">{ic.chev}</span>
       <select
         aria-label={label}
-        className="absolute inset-0 cursor-pointer opacity-0"
+        className="absolute inset-0 cursor-pointer opacity-0 text-ink bg-white dark:text-white dark:bg-[#0c1f18]"
         value={filters[field]}
         onChange={(e) => set(field, e.target.value)}
       >
@@ -227,18 +227,7 @@ export function Shell() {
           </div>
         </div>
         <div className="px-4 pb-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/35">Product</div>
-        <select
-          aria-label="Product"
-          className="mx-3 mb-4 h-9 rounded-lg border-0 bg-white/8 px-3 text-[13px] text-white"
-          defaultValue="finance"
-          onChange={(e) => {
-            if (e.target.value !== 'finance') flash('Facility Management is a separate paper — not this site.')
-            e.target.value = 'finance'
-          }}
-        >
-          <option value="finance">Finance</option>
-          <option value="fm">Facility Management</option>
-        </select>
+        <ProductMenu />
 
         <nav className="flex-1 overflow-y-auto px-2 pb-8">
           {nav.map((s) => (
@@ -442,6 +431,46 @@ export function Shell() {
 
       {toast && (
         <div className="fixed bottom-5 right-5 z-50 rounded-lg bg-[#03160f] px-4 py-2 text-[13px] text-white shadow-lg">{toast}</div>
+      )}
+    </div>
+  )
+}
+
+function ProductMenu() {
+  const { flash } = useFilters()
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="relative mx-3 mb-4">
+      <button
+        type="button"
+        aria-label="Product"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-9 w-full items-center justify-between rounded-lg bg-white/10 px-3 text-left text-[13px] text-white"
+      >
+        Finance
+        <span className="scale-75 text-white/50">{ic.chev}</span>
+      </button>
+      {open && (
+        <div className="absolute left-0 right-0 top-10 z-50 overflow-hidden rounded-lg border border-white/10 bg-[#06261a] py-1 shadow-lg">
+          <button
+            type="button"
+            className="flex h-9 w-full items-center bg-[#1b8a43] px-3 text-left text-[13px] text-white"
+            onClick={() => setOpen(false)}
+          >
+            Finance
+          </button>
+          <button
+            type="button"
+            className="flex h-9 w-full items-center px-3 text-left text-[13px] text-white/80 hover:bg-white/10 hover:text-white"
+            onClick={() => {
+              setOpen(false)
+              flash('Facility Management is a separate paper — not this site.')
+            }}
+          >
+            Facility Management
+          </button>
+        </div>
       )}
     </div>
   )

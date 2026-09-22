@@ -166,7 +166,7 @@ export function Tabs({
   onChange: (id: string) => void
 }) {
   return (
-    <div className="mb-5 flex flex-wrap gap-1 rounded-xl bg-black/[0.04] p-1 dark:bg-white/5">
+    <div className="mb-5 flex flex-wrap gap-1 rounded-xl bg-black/[0.06] p-1 dark:bg-white/10">
       {items.map((t) => (
         <button
           key={t.id}
@@ -174,8 +174,8 @@ export function Tabs({
           onClick={() => onChange(t.id)}
           className={`h-8 rounded-lg px-3 text-[13px] font-medium ${
             value === t.id
-              ? 'bg-white text-ink shadow-sm dark:bg-white/10 dark:text-white'
-              : 'text-mute hover:text-ink dark:hover:text-white'
+              ? 'bg-white text-ink shadow-sm dark:bg-white dark:text-[#03160f]'
+              : 'text-ink/70 hover:text-ink dark:text-white/70 dark:hover:text-white'
           }`}
         >
           {t.label}

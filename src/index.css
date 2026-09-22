@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:is(.dark, .dark *));
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -17,6 +17,20 @@
   --color-amber: #b45309;
 }
 
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+  color: #f3f4f6;
+}
+
+html.dark h1,
+html.dark h2 {
+  color: #f8fafc;
+}
+
 html,
 body,
 #root {
@@ -29,6 +43,20 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
+  word-spacing: normal;
+  letter-spacing: normal;
+}
+
+select,
+option {
+  color: #111827;
+  background-color: #ffffff;
+}
+
+html.dark select,
+html.dark option {
+  color: #f3f4f6;
+  background-color: #0c1f18;
 }
 
 .num {
