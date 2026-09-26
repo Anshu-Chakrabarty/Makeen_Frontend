@@ -59,7 +59,7 @@ export function Contracts() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Renewal timeline" hint="Days to renewal, coloured by contribution margin." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={rows} layout="vertical" margin={vPad(narrow, 110)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
@@ -77,7 +77,7 @@ export function Contracts() {
         </Card>
         <Card>
           <H title="Margin against revenue" hint="Large thin contracts land bottom-right." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} />

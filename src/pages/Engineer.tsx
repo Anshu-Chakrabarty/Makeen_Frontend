@@ -55,7 +55,7 @@ export function Engineer() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Cost per engineer" hint="Sorted by cost on the current basis." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={rows} layout="vertical" margin={vPad(narrow, 100)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
@@ -69,7 +69,7 @@ export function Engineer() {
         </Card>
         <Card>
           <H title="Cost against calls" />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} />

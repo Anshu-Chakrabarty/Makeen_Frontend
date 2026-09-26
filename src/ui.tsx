@@ -217,7 +217,7 @@ export function Table({
   foot?: ReactNode[]
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="max-w-full overflow-x-auto overscroll-x-contain">
       <table className="w-full min-w-[640px] text-left text-[13px]">
         <thead>
           <tr className="text-[10px] font-semibold uppercase tracking-wide text-mute">
@@ -272,11 +272,11 @@ export function axis(narrow = false) {
 }
 
 export function hPad(narrow: boolean) {
-  return narrow ? { top: 4, right: 2, bottom: 4, left: 0 } : { top: 5, right: 5, bottom: 5, left: 5 }
+  return narrow ? { top: 8, right: 12, bottom: 6, left: 4 } : { top: 5, right: 5, bottom: 5, left: 5 }
 }
 
 export function vPad(narrow: boolean, desktopLeft: number) {
-  return narrow ? { top: 4, right: 6, bottom: 4, left: 2 } : { left: desktopLeft }
+  return narrow ? { top: 8, right: 12, bottom: 4, left: 4 } : { left: desktopLeft }
 }
 
 export function vW(narrow: boolean, desktop: number) {

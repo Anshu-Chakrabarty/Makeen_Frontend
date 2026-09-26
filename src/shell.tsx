@@ -164,10 +164,10 @@ function Chip({ field, label }: { field: keyof Filters; label: string }) {
         aria-label={label}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] text-ink"
+        className="flex h-8 max-w-[11rem] items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] text-ink sm:max-w-none"
       >
-        <span className="text-mute">{label}</span>
-        <span className="font-medium">{current}</span>
+        <span className="shrink-0 text-mute">{label}</span>
+        <span className="min-w-0 truncate font-medium">{current}</span>
         <span className="scale-75 text-mute">{ic.chev}</span>
       </button>
       {open && (

@@ -45,7 +45,7 @@ export function Orders() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Segment matrix" hint="Reserved rows have no bar." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={work} layout="vertical" margin={vPad(narrow, 130)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
@@ -78,7 +78,7 @@ export function Orders() {
 
       <Card className="mt-4">
         <H title="Intake against billing" />
-        <div className="h-64 w-full min-w-0">
+        <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={trend} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />

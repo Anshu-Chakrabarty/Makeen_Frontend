@@ -69,7 +69,7 @@ export function Variance() {
 
       <Card className="mt-4">
         <H title="Variance to plan · ₹ Lakh" hint="Click a cell to lock that plant in the header. Swipe sideways on a phone for every month." />
-        <div className="-mx-3 overflow-x-auto overscroll-x-contain px-3 sm:mx-0 sm:px-0">
+        <div className="max-w-full overflow-x-auto overscroll-x-contain">
         <table className="w-full min-w-[720px] text-center text-[10px] sm:min-w-[900px] sm:text-[11px]">
           <thead>
             <tr className="text-[10px] uppercase tracking-[0.1em] text-mute">

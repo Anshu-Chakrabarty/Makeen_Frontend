@@ -65,7 +65,7 @@ export function Overview() {
       <div className="mt-4 grid gap-3 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <H title="Revenue and EBITDA margin" hint="Bars follow the period slice. Line is EBITDA %." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={monthSlice} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -81,7 +81,7 @@ export function Overview() {
         </Card>
         <Card>
           <H title="Revenue mix" hint="Billed by line of business." />
-          <div className="h-48 w-full min-w-0">
+          <div className="h-40 w-full min-w-0 overflow-hidden sm:h-48">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={shownMix} dataKey="value" innerRadius={48} outerRadius={72} paddingAngle={2}>
@@ -110,7 +110,7 @@ export function Overview() {
 
       <Card className="mt-4">
         <H title="Plant contribution" hint="Filtered by region / plant." />
-        <div className="h-72 w-full min-w-0">
+        <div className="h-52 w-full min-w-0 overflow-hidden sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={shownPlants} layout="vertical" margin={vPad(narrow, 90)}>
               <CartesianGrid stroke={chart.grid} horizontal={false} />

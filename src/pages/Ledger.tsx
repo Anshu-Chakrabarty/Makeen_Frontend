@@ -68,7 +68,7 @@ export function Ledger() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="By type and age" />
-          <div className="h-56 w-full min-w-0">
+          <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={kinds.slice(1).map((name) => ({ name, v: counts[name] ?? 0 }))}
@@ -85,7 +85,7 @@ export function Ledger() {
         </Card>
         <Card>
           <H title="Raised against resolved" />
-          <div className="h-56 w-full min-w-0">
+          <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={ledgerTrend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />

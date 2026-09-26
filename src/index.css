@@ -34,10 +34,16 @@ html,
 body,
 #root {
   min-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .recharts-responsive-container {
   width: 100% !important;
+}
+
+.recharts-wrapper {
+  overflow: hidden !important;
 }
 
 body {

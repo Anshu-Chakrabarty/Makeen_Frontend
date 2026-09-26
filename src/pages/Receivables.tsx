@@ -53,7 +53,7 @@ export function Receivables() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="External debtors ageing" hint="Severity ramps with age. The dashed band marks the 91+ watch zone." />
-          <div className="h-56 w-full min-w-0">
+          <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ageing} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -79,7 +79,7 @@ export function Receivables() {
         </Card>
         <Card>
           <H title="Ageing trend" hint="Whether the 180+ block is being worked down, it is not." />
-          <div className="h-56 w-full min-w-0">
+          <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={ageTrend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -98,7 +98,7 @@ export function Receivables() {
 
       <Card className="mt-4">
         <H title="Customer concentration" hint="Bars are 91+ exposure. The line is the cumulative share. Three accounts carry the whole overdue book." />
-        <div className="h-56 w-full min-w-0">
+        <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={custs} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />

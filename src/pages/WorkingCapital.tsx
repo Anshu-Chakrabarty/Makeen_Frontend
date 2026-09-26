@@ -103,7 +103,7 @@ function Cycle() {
         </Card>
         <Card>
           <H title="Cash conversion cycle trend" hint="Twelve months against the 60-day target." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={cccTrend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -157,7 +157,7 @@ function Twc() {
       </div>
       <Card className="mt-4">
         <H title="Working capital by month" hint="Receivables plus inventory minus payables." />
-        <div className="h-72 w-full min-w-0">
+        <div className="h-52 w-full min-w-0 overflow-hidden sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={slice} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -279,7 +279,7 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
       ) : invView === 'chart' ? (
         <Card>
           <H title="Value by warehouse" hint="Fill encodes turns. Plant stores stay grey." />
-          <div className="h-72 w-full min-w-0">
+          <div className="h-52 w-full min-w-0 overflow-hidden sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={shown} layout="vertical" margin={vPad(narrow, 180)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
@@ -320,7 +320,7 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
       <div className="mt-4 grid gap-3 xl:grid-cols-3">
         <Card>
           <H title="Domestic against international purchase" />
-          <div className="mx-auto h-40 w-full min-w-0">
+          <div className="mx-auto h-40 w-full min-w-0 overflow-hidden">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -354,7 +354,7 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
       </div>
       <Card className="mt-4">
         <H title="Import share over time" />
-        <div className="h-56 w-full min-w-0">
+        <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={originRows} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -417,7 +417,7 @@ function Returns() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Monthly trend" hint="Columns are value in ₹ Lakh." />
-          <div className="h-56 w-full min-w-0">
+          <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
@@ -432,7 +432,7 @@ function Returns() {
         </Card>
         <Card>
           <H title="Reason analysis" hint="Combined cancelled and returned value." />
-          <div className="h-56 w-full min-w-0">
+          <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={returnReasons} layout="vertical" margin={vPad(narrow, 140)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
@@ -447,7 +447,7 @@ function Returns() {
       </div>
       <Card className="mt-4">
         <H title="By warehouse" hint="Where cancellations and returns concentrate." />
-        <div className="h-56 w-full min-w-0">
+        <div className="h-44 w-full min-w-0 overflow-hidden sm:h-56">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={shownWh} layout="vertical" margin={vPad(narrow, 200)}>
               <CartesianGrid stroke={chart.grid} horizontal={false} />

@@ -73,7 +73,7 @@ export function Budget() {
 
       <Card className="mt-4">
         <H title="Budget EBITDA to actual" hint="Waterfall in ₹ Lakh. Click a step to open the plant grid." />
-        <div className="h-72 w-full min-w-0">
+        <div className="h-56 w-full min-w-0 overflow-hidden sm:h-72">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={bars}
@@ -104,7 +104,7 @@ export function Budget() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Cost lines" hint="Sorted by absolute variance." />
-          <div className="h-64 w-full min-w-0">
+          <div className="h-48 w-full min-w-0 overflow-hidden sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={costLines} layout="vertical" margin={vPad(narrow, 110)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
