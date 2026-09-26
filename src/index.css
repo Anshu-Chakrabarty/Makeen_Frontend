@@ -36,6 +36,10 @@ body,
   min-height: 100%;
 }
 
+.recharts-responsive-container {
+  width: 100% !important;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);

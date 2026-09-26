@@ -1,6 +1,18 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useFilters } from './filters'
+
+export function useNarrow(bp = 640) {
+  const [n, setN] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia(`(max-width: ${bp - 1}px)`)
+    const apply = () => setN(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [bp])
+  return n
+}
 
 export function cr(n: number, d = 1) {
   const sign = n < 0 ? '−' : ''
@@ -109,7 +121,7 @@ export function Kpi({
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-2xl border border-line bg-card p-5 ${className}`}>
+    <div className={`min-w-0 rounded-2xl border border-line bg-card p-3 sm:p-5 ${className}`}>
       {children}
     </div>
   )
@@ -255,6 +267,29 @@ export const chart = {
   grey: '#94a3b8',
 }
 
-export function axis() {
-  return { fill: '#6b7280', fontSize: 11 }
+export function axis(narrow = false) {
+  return { fill: '#6b7280', fontSize: narrow ? 10 : 11 }
+}
+
+export function hPad(narrow: boolean) {
+  return narrow ? { top: 4, right: 2, bottom: 4, left: 0 } : { top: 5, right: 5, bottom: 5, left: 5 }
+}
+
+export function vPad(narrow: boolean, desktopLeft: number) {
+  return narrow ? { top: 4, right: 6, bottom: 4, left: 2 } : { left: desktopLeft }
+}
+
+export function vW(narrow: boolean, desktop: number) {
+  return narrow ? Math.min(78, desktop) : desktop
+}
+
+export function nW(narrow: boolean) {
+  return narrow ? 32 : 60
+}
+
+export function shortTick(n = 12) {
+  return (v: string | number) => {
+    const s = String(v)
+    return s.length > n ? `${s.slice(0, n - 1)}…` : s
+  }
 }

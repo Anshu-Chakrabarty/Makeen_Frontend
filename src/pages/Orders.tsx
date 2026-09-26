@@ -2,9 +2,10 @@ import { useEffect } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { intakeTrend, orders } from '../data'
 import { useFilters } from '../filters'
-import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 export function Orders() {
+  const narrow = useNarrow()
   const { filters, money, registerExport, exportCsv, monthSlice } = useFilters()
   const shown = filters.segment === 'All' ? orders : orders.filter((o) => o.name.startsWith(filters.segment) || o.reserved)
   const work = shown.filter((o) => !o.reserved)
@@ -44,12 +45,12 @@ export function Orders() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Segment matrix" hint="Reserved rows have no bar." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <BarChart data={work} layout="vertical" margin={{ left: 130 }}>
+          <div className="h-64 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={work} layout="vertical" margin={vPad(narrow, 130)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={130} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={vW(narrow, 130)} tick={axis(narrow)} tickFormatter={narrow ? shortTick(12) : undefined} />
                 <Tooltip />
                 <Bar dataKey="intake" fill={chart.teal} name="Actual intake" barSize={10} />
                 <Bar dataKey="budget" fill={chart.green} name="Budget YTD" barSize={10} />
@@ -77,12 +78,12 @@ export function Orders() {
 
       <Card className="mt-4">
         <H title="Intake against billing" />
-        <div className="h-64">
-          <ResponsiveContainer>
-            <LineChart data={trend}>
+        <div className="h-64 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={trend} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="m" tick={axis()} />
-              <YAxis tick={axis()} />
+              <XAxis dataKey="m" tick={axis(narrow)} />
+              <YAxis width={nW(narrow)} tick={axis(narrow)} />
               <Tooltip />
               <Line dataKey="backlog" stroke={chart.blue} strokeWidth={2} name="Backlog" />
               <Line dataKey="intake" stroke={chart.green} strokeWidth={2} name="Intake" />

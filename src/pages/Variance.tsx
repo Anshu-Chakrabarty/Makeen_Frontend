@@ -67,12 +67,13 @@ export function Variance() {
         <Kpi label="Consistently short" value={String(grid.filter((r) => r.months.slice(0, 7).every((v) => v < 0)).length)} note="Below plan every month" />
       </div>
 
-      <Card className="mt-4 overflow-x-auto">
-        <H title="Variance to plan · ₹ Lakh" hint="Click a cell to lock that plant in the header." />
-        <table className="w-full min-w-[900px] text-center text-[11px]">
+      <Card className="mt-4">
+        <H title="Variance to plan · ₹ Lakh" hint="Click a cell to lock that plant in the header. Swipe sideways on a phone for every month." />
+        <div className="-mx-3 overflow-x-auto overscroll-x-contain px-3 sm:mx-0 sm:px-0">
+        <table className="w-full min-w-[720px] text-center text-[10px] sm:min-w-[900px] sm:text-[11px]">
           <thead>
             <tr className="text-[10px] uppercase tracking-[0.1em] text-mute">
-              <th className="pb-2 pr-3 text-left font-semibold">Plant</th>
+              <th className="sticky left-0 z-10 bg-card pb-2 pr-3 text-left font-semibold">Plant</th>
               {yearMonths.map((m) => (
                 <th key={m} className="pb-2 font-semibold">
                   {m}
@@ -86,7 +87,7 @@ export function Variance() {
               const ytd = r.months.slice(0, 7).reduce((s, v) => s + v, 0)
               return (
                 <tr key={r.plant}>
-                  <td className="py-1 pr-3 text-left font-medium">
+                  <td className="sticky left-0 z-10 bg-card py-1 pr-3 text-left font-medium">
                     <button type="button" className="underline" onClick={() => set('plant', r.plant)}>
                       {r.plant}
                     </button>
@@ -113,6 +114,7 @@ export function Variance() {
             })}
           </tbody>
         </table>
+        </div>
       </Card>
 
       <Card className="mt-4">

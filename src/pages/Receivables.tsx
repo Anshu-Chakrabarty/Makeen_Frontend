@@ -2,9 +2,19 @@ import { useEffect, useState } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { ageTrend, ageing, customers, invoices } from '../data'
 import { matchOmc, matchRegion, useFilters } from '../filters'
-import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, useNarrow } from '../ui'
+
+const shortAge: Record<string, string> = {
+  'Not due': 'Not due',
+  '0–30 days': '0–30',
+  '31–60 days': '31–60',
+  '61–90 days': '61–90',
+  '91–180 days': '91–180',
+  'Older than 180': '180+',
+}
 
 export function Receivables() {
+  const narrow = useNarrow()
   const { filters, money, registerExport, exportCsv, flash } = useFilters()
   const [owners, setOwners] = useState<Record<string, string>>({})
   const custs = customers.filter((c) => matchOmc(c.name, filters.omc))
@@ -43,12 +53,19 @@ export function Receivables() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="External debtors ageing" hint="Severity ramps with age. The dashed band marks the 91+ watch zone." />
-          <div className="h-56">
-            <ResponsiveContainer>
-              <BarChart data={ageing}>
+          <div className="h-56 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ageing} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="name" tick={axis()} interval={0} angle={-12} height={50} />
-                <YAxis tick={axis()} />
+                <XAxis
+                  dataKey="name"
+                  tick={axis(narrow)}
+                  interval={0}
+                  angle={narrow ? -28 : -12}
+                  height={narrow ? 48 : 50}
+                  tickFormatter={narrow ? (v) => shortAge[String(v)] ?? String(v) : undefined}
+                />
+                <YAxis width={nW(narrow)} tick={axis(narrow)} />
                 <Tooltip />
                 <Bar dataKey="v" radius={[4, 4, 0, 0]}>
                   {ageing.map((a, i) => (
@@ -62,12 +79,12 @@ export function Receivables() {
         </Card>
         <Card>
           <H title="Ageing trend" hint="Whether the 180+ block is being worked down, it is not." />
-          <div className="h-56">
-            <ResponsiveContainer>
-              <AreaChart data={ageTrend}>
+          <div className="h-56 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={ageTrend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="m" tick={axis()} />
-                <YAxis tick={axis()} />
+                <XAxis dataKey="m" tick={axis(narrow)} />
+                <YAxis width={nW(narrow)} tick={axis(narrow)} />
                 <Tooltip />
                 <Area dataKey="current" stackId="a" fill="#16a34a55" stroke={chart.green} name="Current / 0–90" />
                 <Area dataKey="mid" stackId="a" fill="#b4530955" stroke={chart.amber} name="91–180" />
@@ -81,13 +98,13 @@ export function Receivables() {
 
       <Card className="mt-4">
         <H title="Customer concentration" hint="Bars are 91+ exposure. The line is the cumulative share. Three accounts carry the whole overdue book." />
-        <div className="h-56">
-          <ResponsiveContainer>
-            <ComposedChart data={custs}>
+        <div className="h-56 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={custs} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="name" tick={axis()} />
-              <YAxis yAxisId="b" tick={axis()} />
-              <YAxis yAxisId="p" orientation="right" unit="%" tick={axis()} />
+              <XAxis dataKey="name" tick={axis(narrow)} />
+              <YAxis yAxisId="b" width={nW(narrow)} tick={axis(narrow)} />
+              <YAxis yAxisId="p" orientation="right" width={nW(narrow)} tick={axis(narrow)} unit="%" />
               <Tooltip />
               <Bar yAxisId="b" dataKey="overdue" fill={chart.amber} barSize={48} name="91+ exposure" radius={[4, 4, 0, 0]} />
               <Line yAxisId="p" dataKey="share" stroke={chart.blue} strokeWidth={2} name="Cumulative %" />

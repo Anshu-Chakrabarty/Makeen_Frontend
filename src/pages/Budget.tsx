@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { bridge, costLines } from '../data'
 import { useFilters } from '../filters'
-import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 const steps = [
   { step: 'Budget EBITDA', v: 71.44, pct: '—', driver: '—', owner: '—' },
@@ -17,7 +17,20 @@ const steps = [
   { step: 'Actual EBITDA', v: 57.14, pct: '—', driver: '—', owner: '—' },
 ]
 
+const shortStep: Record<string, string> = {
+  'Budget EBITDA': 'Budget',
+  'Higher revenue': 'Revenue',
+  'Lower GP ratio': 'GP',
+  'Sales expense saved': 'Sales',
+  'Higher G&A': 'G&A',
+  'Higher staff': 'Staff',
+  'Overheads saved': 'OH',
+  'FC / allocations': 'FC',
+  'Actual EBITDA': 'Actual',
+}
+
 export function Budget() {
+  const narrow = useNarrow()
   const nav = useNavigate()
   const { filters, money, moneyLakh, registerExport, exportCsv } = useFilters()
   const bars = bridge.map((b, i) => ({
@@ -60,15 +73,23 @@ export function Budget() {
 
       <Card className="mt-4">
         <H title="Budget EBITDA to actual" hint="Waterfall in ₹ Lakh. Click a step to open the plant grid." />
-        <div className="h-72">
-          <ResponsiveContainer>
+        <div className="h-72 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={bars}
+              margin={hPad(narrow)}
               onClick={() => nav('/variance')}
             >
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="name" interval={0} angle={-18} height={70} tick={axis()} />
-              <YAxis tick={axis()} />
+              <XAxis
+                dataKey="name"
+                interval={0}
+                angle={narrow ? -40 : -18}
+                height={narrow ? 76 : 70}
+                tick={axis(narrow)}
+                tickFormatter={narrow ? (v) => shortStep[String(v)] ?? String(v) : undefined}
+              />
+              <YAxis width={nW(narrow)} tick={axis(narrow)} />
               <Tooltip />
               <Bar dataKey="v" radius={[4, 4, 0, 0]}>
                 {bars.map((b) => (
@@ -83,12 +104,12 @@ export function Budget() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Cost lines" hint="Sorted by absolute variance." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <BarChart data={costLines} layout="vertical" margin={{ left: 110 }}>
+          <div className="h-64 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={costLines} layout="vertical" margin={vPad(narrow, 110)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={110} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={vW(narrow, 110)} tick={axis(narrow)} tickFormatter={narrow ? shortTick(12) : undefined} />
                 <Tooltip />
                 <Bar dataKey="actual" fill={chart.teal} barSize={10} name="Actual" />
                 <Bar dataKey="plan" fill={chart.green} barSize={10} name="Plan" />

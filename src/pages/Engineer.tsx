@@ -2,9 +2,10 @@ import { useEffect } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts'
 import { engineers } from '../data'
 import { matchRegion, useFilters } from '../filters'
-import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, useNarrow, vPad, vW } from '../ui'
 
 export function Engineer() {
+  const narrow = useNarrow()
   const { filters, moneyLakh, registerExport, exportCsv, flash } = useFilters()
   const rows = engineers.filter((e) => {
     const plants = e.plants.split(', ')
@@ -54,12 +55,12 @@ export function Engineer() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Cost per engineer" hint="Sorted by cost on the current basis." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <BarChart data={rows} layout="vertical" margin={{ left: 100 }}>
+          <div className="h-64 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rows} layout="vertical" margin={vPad(narrow, 100)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={100} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={vW(narrow, 100)} tick={axis(narrow)} />
                 <Tooltip />
                 <Bar dataKey="cost" fill={chart.teal} barSize={12} name="Cost ₹ Lakh" />
               </BarChart>
@@ -68,12 +69,12 @@ export function Engineer() {
         </Card>
         <Card>
           <H title="Cost against calls" />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <ScatterChart>
+          <div className="h-64 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} />
-                <XAxis dataKey="calls" name="Calls" tick={axis()} />
-                <YAxis dataKey="cost" name="Cost" tick={axis()} />
+                <XAxis dataKey="calls" name="Calls" tick={axis(narrow)} />
+                <YAxis dataKey="cost" name="Cost" width={nW(narrow)} tick={axis(narrow)} />
                 <Tooltip />
                 <Scatter data={scatter} fill={chart.green} />
               </ScatterChart>

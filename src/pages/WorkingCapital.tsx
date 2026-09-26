@@ -17,7 +17,7 @@ import {
 } from 'recharts'
 import { cccTrend, cycle, originShare, returnLines, returnReasons, returnWh, returnsMonth, twc, warehouses } from '../data'
 import { matchOmc, useFilters } from '../filters'
-import { Banner, Card, H, Kpi, PageHead, Pill, ScopeLine, Table, Tabs, axis, chart } from '../ui'
+import { Banner, Card, H, Kpi, PageHead, Pill, ScopeLine, Table, Tabs, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 const tabs = [
   { id: 'cycle', label: 'Cycle' },
@@ -57,6 +57,7 @@ export function WorkingCapital() {
 }
 
 function Cycle() {
+  const narrow = useNarrow()
   const { registerExport, exportCsv } = useFilters()
   useEffect(() => {
     registerExport(() =>
@@ -102,12 +103,12 @@ function Cycle() {
         </Card>
         <Card>
           <H title="Cash conversion cycle trend" hint="Twelve months against the 60-day target." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <ComposedChart data={cccTrend}>
+          <div className="h-64 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={cccTrend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="m" tick={axis()} />
-                <YAxis domain={[50, 85]} tick={axis()} />
+                <XAxis dataKey="m" tick={axis(narrow)} />
+                <YAxis width={nW(narrow)} domain={[50, 85]} tick={axis(narrow)} />
                 <Tooltip />
                 <Line dataKey="ccc" stroke={chart.teal} strokeWidth={2} name="CCC" />
               </ComposedChart>
@@ -126,6 +127,7 @@ function Cycle() {
 }
 
 function Twc() {
+  const narrow = useNarrow()
   const { filters, money, moneyYtd, monthSlice, registerExport, exportCsv } = useFilters()
   const slice = twc.filter((r) => monthSlice.some((m) => m.m === r.m))
   const last = slice[slice.length - 1] ?? twc[twc.length - 1]
@@ -155,15 +157,15 @@ function Twc() {
       </div>
       <Card className="mt-4">
         <H title="Working capital by month" hint="Receivables plus inventory minus payables." />
-        <div className="h-72">
-          <ResponsiveContainer>
-            <ComposedChart data={slice}>
+        <div className="h-72 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={slice} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="m" tick={axis()} />
-              <YAxis yAxisId="a" tick={axis()} />
-              <YAxis yAxisId="b" orientation="right" unit="%" tick={axis()} />
+              <XAxis dataKey="m" tick={axis(narrow)} />
+              <YAxis yAxisId="a" width={nW(narrow)} tick={axis(narrow)} />
+              <YAxis yAxisId="b" orientation="right" width={nW(narrow)} tick={axis(narrow)} unit="%" />
               <Tooltip />
-              <Legend />
+              {!narrow && <Legend />}
               <Bar yAxisId="a" dataKey="ar" fill={chart.green} name="Receivables" />
               <Bar yAxisId="a" dataKey="inv" fill={chart.blue} name="Inventory" />
               <Bar yAxisId="a" dataKey="ap" fill={chart.amber} name="Payables" />
@@ -193,6 +195,7 @@ function useWarehouseSlice() {
 }
 
 function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) => void }) {
+  const narrow = useNarrow()
   const { filters, set, money, registerExport, exportCsv, monthSlice } = useFilters()
   const shown = useWarehouseSlice()
   const scoped = warehouses.filter((w) => w.inScope)
@@ -276,12 +279,12 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
       ) : invView === 'chart' ? (
         <Card>
           <H title="Value by warehouse" hint="Fill encodes turns. Plant stores stay grey." />
-          <div className="h-72">
-            <ResponsiveContainer>
-              <BarChart data={shown} layout="vertical" margin={{ left: 180 }}>
+          <div className="h-72 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={shown} layout="vertical" margin={vPad(narrow, 180)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={180} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={vW(narrow, 180)} tick={axis(narrow)} tickFormatter={narrow ? shortTick(12) : undefined} />
                 <Tooltip />
                 <Bar dataKey="val" radius={[0, 4, 4, 0]}>
                   {shown.map((w) => (
@@ -317,8 +320,8 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
       <div className="mt-4 grid gap-3 xl:grid-cols-3">
         <Card>
           <H title="Domestic against international purchase" />
-          <div className="h-40">
-            <ResponsiveContainer>
+          <div className="mx-auto h-40 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={[
@@ -351,12 +354,12 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
       </div>
       <Card className="mt-4">
         <H title="Import share over time" />
-        <div className="h-56">
-          <ResponsiveContainer>
-            <BarChart data={originRows}>
+        <div className="h-56 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={originRows} margin={hPad(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="m" tick={axis()} />
-              <YAxis tick={axis()} unit="%" />
+              <XAxis dataKey="m" tick={axis(narrow)} />
+              <YAxis width={nW(narrow)} tick={axis(narrow)} unit="%" />
               <Tooltip />
               <Bar dataKey="domestic" stackId="a" fill={chart.green} name="Domestic" />
               <Bar dataKey="intl" stackId="a" fill={chart.blue} name="International" />
@@ -369,6 +372,7 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
 }
 
 function Returns() {
+  const narrow = useNarrow()
   const { filters, moneyLakh, registerExport, exportCsv, flash, monthSlice } = useFilters()
   const lines = returnLines.filter((r) => matchOmc(r.cust, filters.omc) && (filters.origin === 'All' || warehouses.find((w) => w.name === r.wh)?.origin === filters.origin))
   const shownWh = returnWh.filter((w) => {
@@ -413,12 +417,12 @@ function Returns() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Monthly trend" hint="Columns are value in ₹ Lakh." />
-          <div className="h-56">
-            <ResponsiveContainer>
-              <BarChart data={trend}>
+          <div className="h-56 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={trend} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="m" tick={axis()} />
-                <YAxis tick={axis()} />
+                <XAxis dataKey="m" tick={axis(narrow)} />
+                <YAxis width={nW(narrow)} tick={axis(narrow)} />
                 <Tooltip />
                 <Bar dataKey="cancel" fill={chart.rose} name="Cancelled" />
                 <Bar dataKey="ret" fill={chart.amber} name="Returned" />
@@ -428,12 +432,12 @@ function Returns() {
         </Card>
         <Card>
           <H title="Reason analysis" hint="Combined cancelled and returned value." />
-          <div className="h-56">
-            <ResponsiveContainer>
-              <BarChart data={returnReasons} layout="vertical" margin={{ left: 140 }}>
+          <div className="h-56 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={returnReasons} layout="vertical" margin={vPad(narrow, 140)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={140} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={vW(narrow, 140)} tick={axis(narrow)} tickFormatter={narrow ? shortTick(12) : undefined} />
                 <Tooltip />
                 <Bar dataKey="v" fill={chart.amber} barSize={12} />
               </BarChart>
@@ -443,12 +447,12 @@ function Returns() {
       </div>
       <Card className="mt-4">
         <H title="By warehouse" hint="Where cancellations and returns concentrate." />
-        <div className="h-56">
-          <ResponsiveContainer>
-            <BarChart data={shownWh} layout="vertical" margin={{ left: 200 }}>
+        <div className="h-56 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={shownWh} layout="vertical" margin={vPad(narrow, 200)}>
               <CartesianGrid stroke={chart.grid} horizontal={false} />
-              <XAxis type="number" tick={axis()} />
-              <YAxis type="category" dataKey="name" width={200} tick={axis()} />
+              <XAxis type="number" tick={axis(narrow)} />
+              <YAxis type="category" dataKey="name" width={vW(narrow, 200)} tick={axis(narrow)} tickFormatter={narrow ? shortTick(12) : undefined} />
               <Tooltip />
               <Bar dataKey="cVal" fill={chart.rose} name="Cancelled" barSize={8} />
               <Bar dataKey="rVal" fill={chart.amber} name="Returned" barSize={8} />

@@ -14,9 +14,10 @@ import {
 } from 'recharts'
 import { mix, plants } from '../data'
 import { matchRegion, useFilters } from '../filters'
-import { Alert, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Alert, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, useNarrow, vPad, vW } from '../ui'
 
 export function Overview() {
+  const narrow = useNarrow()
   const { filters, money, moneyYtd, monthSlice, registerExport, exportCsv, rates } = useFilters()
   const shownMix = filters.segment === 'All' ? mix : mix.filter((s) => s.name === filters.segment)
   const shownPlants = plants.filter((p) => matchRegion(p.name, filters.region) && (filters.plant === 'All' || p.name === filters.plant))
@@ -64,13 +65,13 @@ export function Overview() {
       <div className="mt-4 grid gap-3 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <H title="Revenue and EBITDA margin" hint="Bars follow the period slice. Line is EBITDA %." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <ComposedChart data={monthSlice}>
+          <div className="h-64 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={monthSlice} margin={hPad(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="m" tick={axis()} />
-                <YAxis yAxisId="r" tick={axis()} />
-                <YAxis yAxisId="p" orientation="right" unit="%" tick={axis()} />
+                <XAxis dataKey="m" tick={axis(narrow)} />
+                <YAxis yAxisId="r" width={nW(narrow)} tick={axis(narrow)} />
+                <YAxis yAxisId="p" orientation="right" width={nW(narrow)} tick={axis(narrow)} unit="%" />
                 <Tooltip />
                 <Bar yAxisId="r" dataKey="rev" fill={chart.green} barSize={28} name="Revenue" radius={[4, 4, 0, 0]} />
                 <Line yAxisId="p" dataKey="ebitdaPct" stroke="#eab308" strokeWidth={2} name="EBITDA %" dot={{ r: 3 }} />
@@ -80,8 +81,8 @@ export function Overview() {
         </Card>
         <Card>
           <H title="Revenue mix" hint="Billed by line of business." />
-          <div className="h-48">
-            <ResponsiveContainer>
+          <div className="h-48 w-full min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie data={shownMix} dataKey="value" innerRadius={48} outerRadius={72} paddingAngle={2}>
                   {shownMix.map((s) => (
@@ -109,12 +110,12 @@ export function Overview() {
 
       <Card className="mt-4">
         <H title="Plant contribution" hint="Filtered by region / plant." />
-        <div className="h-72">
-          <ResponsiveContainer>
-            <ComposedChart data={shownPlants} layout="vertical" margin={{ left: 90 }}>
+        <div className="h-72 w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={shownPlants} layout="vertical" margin={vPad(narrow, 90)}>
               <CartesianGrid stroke={chart.grid} horizontal={false} />
-              <XAxis type="number" tick={axis()} />
-              <YAxis type="category" dataKey="name" width={90} tick={axis()} />
+              <XAxis type="number" tick={axis(narrow)} />
+              <YAxis type="category" dataKey="name" width={vW(narrow, 90)} tick={axis(narrow)} />
               <Tooltip />
               <Bar dataKey="v" barSize={12} radius={[0, 4, 4, 0]}>
                 {shownPlants.map((p) => (
