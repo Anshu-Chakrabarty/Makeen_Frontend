@@ -67,9 +67,10 @@ export function Variance() {
         <Kpi label="Consistently short" value={String(grid.filter((r) => r.months.slice(0, 7).every((v) => v < 0)).length)} note="Below plan every month" />
       </div>
 
-      <Card className="mt-4 overflow-x-auto">
+      <Card className="mt-4">
         <H title="Variance to plan · ₹ Lakh" hint="Click a cell to lock that plant in the header." />
-        <table className="w-full min-w-[900px] text-center text-[11px]">
+        <div className="-mx-1 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
+        <table className="w-full min-w-[640px] text-center text-[10px] sm:min-w-[900px] sm:text-[11px]">
           <thead>
             <tr className="text-[10px] uppercase tracking-[0.1em] text-mute">
               <th className="pb-2 pr-3 text-left font-semibold">Plant</th>
@@ -113,6 +114,7 @@ export function Variance() {
             })}
           </tbody>
         </table>
+        </div>
       </Card>
 
       <Card className="mt-4">

@@ -34,6 +34,19 @@ html,
 body,
 #root {
   min-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#root,
+main {
+  min-width: 0;
+}
+
+.recharts-responsive-container,
+.recharts-wrapper,
+.recharts-surface {
+  max-width: 100%;
 }
 
 body {

@@ -2,9 +2,10 @@ import { useEffect } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { intakeTrend, orders } from '../data'
 import { useFilters } from '../filters'
-import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Card, ChartBox, H, Kpi, PageHead, ScopeLine, Table, axis, chart, plotMargin, tickShort, useNarrow } from '../ui'
 
 export function Orders() {
+  const narrow = useNarrow()
   const { filters, money, registerExport, exportCsv, monthSlice } = useFilters()
   const shown = filters.segment === 'All' ? orders : orders.filter((o) => o.name.startsWith(filters.segment) || o.reserved)
   const work = shown.filter((o) => !o.reserved)
@@ -44,18 +45,18 @@ export function Orders() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Segment matrix" hint="Reserved rows have no bar." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <BarChart data={work} layout="vertical" margin={{ left: 130 }}>
+          <ChartBox>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={work} layout="vertical" margin={plotMargin(narrow)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={130} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={narrow ? 72 : 130} tick={axis(narrow)} tickFormatter={tickShort(narrow ? 11 : 22)} />
                 <Tooltip />
                 <Bar dataKey="intake" fill={chart.teal} name="Actual intake" barSize={10} />
                 <Bar dataKey="budget" fill={chart.green} name="Budget YTD" barSize={10} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </ChartBox>
         </Card>
         <Card>
           <H title="Book-to-bill" hint="Against a 1.20× threshold." />
@@ -77,19 +78,19 @@ export function Orders() {
 
       <Card className="mt-4">
         <H title="Intake against billing" />
-        <div className="h-64">
-          <ResponsiveContainer>
-            <LineChart data={trend}>
+        <ChartBox>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={trend} margin={plotMargin(narrow)}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="m" tick={axis()} />
-              <YAxis tick={axis()} />
+              <XAxis dataKey="m" tick={axis(narrow)} />
+              <YAxis width={narrow ? 32 : 45} tick={axis(narrow)} />
               <Tooltip />
               <Line dataKey="backlog" stroke={chart.blue} strokeWidth={2} name="Backlog" />
               <Line dataKey="intake" stroke={chart.green} strokeWidth={2} name="Intake" />
               <Line dataKey="billed" stroke={chart.teal} strokeWidth={2} name="Billed" />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </ChartBox>
       </Card>
 
       <Card className="mt-4">

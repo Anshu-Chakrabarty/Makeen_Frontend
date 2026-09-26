@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { bridge, costLines } from '../data'
 import { useFilters } from '../filters'
-import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
+import { Banner, Card, ChartBox, H, Kpi, PageHead, ScopeLine, Table, axis, chart, plotMargin, tickShort, useNarrow } from '../ui'
 
 const steps = [
   { step: 'Budget EBITDA', v: 71.44, pct: '—', driver: '—', owner: '—' },
@@ -18,6 +18,7 @@ const steps = [
 ]
 
 export function Budget() {
+  const narrow = useNarrow()
   const nav = useNavigate()
   const { filters, money, moneyLakh, registerExport, exportCsv } = useFilters()
   const bars = bridge.map((b, i) => ({
@@ -60,15 +61,16 @@ export function Budget() {
 
       <Card className="mt-4">
         <H title="Budget EBITDA to actual" hint="Waterfall in ₹ Lakh. Click a step to open the plant grid." />
-        <div className="h-72">
-          <ResponsiveContainer>
+        <ChartBox className="h-60 sm:h-72">
+          <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={bars}
+              margin={plotMargin(narrow)}
               onClick={() => nav('/variance')}
             >
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="name" interval={0} angle={-18} height={70} tick={axis()} />
-              <YAxis tick={axis()} />
+              <XAxis dataKey="name" interval={0} angle={narrow ? -42 : -18} height={narrow ? 86 : 70} tick={axis(narrow)} tickFormatter={tickShort(narrow ? 11 : 20)} />
+              <YAxis width={narrow ? 28 : 40} tick={axis(narrow)} />
               <Tooltip />
               <Bar dataKey="v" radius={[4, 4, 0, 0]}>
                 {bars.map((b) => (
@@ -77,24 +79,24 @@ export function Budget() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </ChartBox>
       </Card>
 
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="Cost lines" hint="Sorted by absolute variance." />
-          <div className="h-64">
-            <ResponsiveContainer>
-              <BarChart data={costLines} layout="vertical" margin={{ left: 110 }}>
+          <ChartBox>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={costLines} layout="vertical" margin={plotMargin(narrow)}>
                 <CartesianGrid stroke={chart.grid} horizontal={false} />
-                <XAxis type="number" tick={axis()} />
-                <YAxis type="category" dataKey="name" width={110} tick={axis()} />
+                <XAxis type="number" tick={axis(narrow)} />
+                <YAxis type="category" dataKey="name" width={narrow ? 72 : 110} tick={axis(narrow)} tickFormatter={tickShort(narrow ? 11 : 22)} />
                 <Tooltip />
                 <Bar dataKey="actual" fill={chart.teal} barSize={10} name="Actual" />
                 <Bar dataKey="plan" fill={chart.green} barSize={10} name="Plan" />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </ChartBox>
         </Card>
         <Card>
           <H title="Against plan" />

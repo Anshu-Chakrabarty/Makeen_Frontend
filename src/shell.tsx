@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   currencies,
@@ -152,33 +152,55 @@ function options(key: keyof Filters) {
   return []
 }
 
-function Chip({ field, label }: { field: keyof Filters; label: string }) {
+function Chip({ field, label, block }: { field: keyof Filters; label: string; block?: boolean }) {
   const { filters, set } = useFilters()
   const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 180 })
+  const btn = useRef<HTMLButtonElement>(null)
   const opts = options(field)
   const current = opts.find((o) => o.value === filters[field])?.label ?? filters[field]
+
+  const toggle = () => {
+    const next = !open
+    if (next && btn.current) {
+      const r = btn.current.getBoundingClientRect()
+      const width = Math.min(288, Math.max(r.width, 176), window.innerWidth - 16)
+      let left = r.left
+      if (left + width > window.innerWidth - 8) left = window.innerWidth - 8 - width
+      if (left < 8) left = 8
+      setPos({ top: Math.min(r.bottom + 4, window.innerHeight - 220), left, width })
+    }
+    setOpen(next)
+  }
+
   return (
-    <div className="relative">
+    <div className={block ? 'min-w-0' : 'relative shrink-0'}>
       <button
+        ref={btn}
         type="button"
         aria-label={label}
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        className="flex h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] text-ink"
+        onClick={toggle}
+        className={`flex h-8 items-center gap-1.5 rounded-lg border border-line bg-card px-2.5 text-[12px] text-ink ${
+          block ? 'w-full min-w-0 justify-between' : 'max-w-[11.5rem] sm:max-w-none'
+        }`}
       >
-        <span className="text-mute">{label}</span>
-        <span className="font-medium">{current}</span>
-        <span className="scale-75 text-mute">{ic.chev}</span>
+        <span className="shrink-0 text-mute">{label}</span>
+        <span className="min-w-0 truncate font-medium">{current}</span>
+        <span className="scale-75 shrink-0 text-mute">{ic.chev}</span>
       </button>
       {open && (
         <>
           <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-9 z-50 max-h-72 min-w-full overflow-auto rounded-lg border border-line bg-card py-1 shadow-lg">
+          <div
+            className="fixed z-50 max-h-72 overflow-auto rounded-lg border border-line bg-card py-1 shadow-lg"
+            style={{ top: pos.top, left: pos.left, width: pos.width }}
+          >
             {opts.map((o) => (
               <button
                 key={o.value}
                 type="button"
-                className={`block w-full px-3 py-1.5 text-left text-[13px] text-ink hover:bg-black/5 dark:hover:bg-white/10 ${
+                className={`block w-full px-3 py-2 text-left text-[13px] text-ink hover:bg-black/5 dark:hover:bg-white/10 ${
                   o.value === filters[field] ? 'bg-black/5 font-semibold dark:bg-white/10' : ''
                 }`}
                 onClick={() => {
@@ -233,17 +255,31 @@ export function Shell() {
     flash(`Saved view “${name}”`)
   }
 
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
+  useEffect(() => {
+    setOpen(false)
+  }, [loc.pathname])
+
   return (
-    <div className="min-h-screen bg-paper text-ink">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-paper text-ink">
       {open && <button className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={() => setOpen(false)} />}
 
-      <aside className={`fixed inset-y-0 left-0 z-40 flex w-[256px] flex-col bg-[#03160f] text-white ${open ? 'flex' : 'hidden'} lg:flex`}>
-        <div className="flex items-center gap-2.5 px-4 py-5">
+      <aside className={`fixed inset-y-0 left-0 z-40 flex w-[min(256px,88vw)] flex-col bg-[#03160f] text-white ${open ? 'flex' : 'hidden'} lg:flex`}>
+        <div className="flex items-center gap-2.5 px-4 py-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#f3f4f2] text-[13px] font-bold text-[#03160f]">M</div>
-          <div className="leading-tight">
+          <div className="min-w-0 leading-tight">
             <div className="text-[12px] font-semibold tracking-[0.04em]">MAKEEN</div>
             <div className="text-[9px] font-medium uppercase tracking-[0.16em] text-white/40">Energy · India</div>
           </div>
+          <button type="button" aria-label="Close menu" className="ml-auto px-1 text-white/60 lg:hidden" onClick={() => setOpen(false)}>
+            ✕
+          </button>
         </div>
         <div className="px-4 pb-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/35">Product</div>
         <ProductMenu />
@@ -253,17 +289,19 @@ export function Shell() {
         </nav>
       </aside>
 
-      <div className="lg:pl-[256px]">
-        <header className="sticky top-0 z-20 border-b border-line bg-card">
-          <div className="flex h-12 items-center gap-3 px-4">
-            <button type="button" className="lg:hidden" onClick={() => setOpen(true)}>
+      <div className="min-w-0 lg:pl-[256px]">
+        <header className="sticky top-0 z-20 border-b border-line bg-card pt-[env(safe-area-inset-top)]">
+          <div className="flex h-12 items-center gap-2 px-3 sm:gap-3 sm:px-4">
+            <button type="button" aria-label="Open menu" className="flex h-8 w-8 shrink-0 items-center justify-center lg:hidden" onClick={() => setOpen(true)}>
               {ic.orders}
             </button>
-            <div className="text-[13px] text-mute">
-              {crumb[0]} <span className="mx-1 text-[#d4d6d4]">/</span>
+            <div className="min-w-0 truncate text-[12px] text-mute sm:text-[13px]">
+              <span className="hidden sm:inline">
+                {crumb[0]} <span className="mx-1 text-[#d4d6d4]">/</span>
+              </span>
               <span className="text-ink">{crumb[1]}</span>
             </div>
-            <div className="relative ml-auto flex items-center gap-2">
+            <div className="relative ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
               <label className="relative hidden md:block">
                 <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-mute">{ic.search}</span>
                 <input
@@ -274,7 +312,7 @@ export function Shell() {
                   }}
                   onFocus={() => setShowSearch(true)}
                   placeholder="Search pages"
-                  className="h-8 w-48 rounded-lg border border-line bg-paper px-3 pl-8 text-[12px] text-ink outline-none placeholder:text-mute"
+                  className="h-8 w-48 rounded-lg border border-line bg-paper px-3 pl-8 text-[16px] text-ink outline-none placeholder:text-mute sm:text-[12px]"
                 />
                 {showSearch && hits.length > 0 && (
                   <div className="absolute left-0 top-9 z-30 w-64 rounded-lg border border-line bg-card py-1 shadow-lg">
@@ -295,6 +333,16 @@ export function Shell() {
                   </div>
                 )}
               </label>
+              <IconBtn className="md:hidden" onClick={() => setShowSearch((v) => !v)}>
+                {ic.search}
+              </IconBtn>
+              <button
+                type="button"
+                onClick={() => setShowFx((v) => !v)}
+                className="flex h-8 items-center rounded-lg border border-line bg-card px-2 text-[11px] font-medium text-mute sm:hidden"
+              >
+                FX
+              </button>
               <button
                 type="button"
                 onClick={() => setShowFx((v) => !v)}
@@ -307,7 +355,7 @@ export function Shell() {
               <div className="relative">
                 <IconBtn onClick={() => setShowBell((v) => !v)}>{ic.bell}</IconBtn>
                 {showBell && (
-                  <div className="absolute right-0 top-9 z-30 w-72 rounded-lg border border-line bg-card p-2 shadow-lg">
+                  <div className="absolute right-0 top-9 z-30 w-[min(18rem,calc(100vw-1.5rem))] rounded-lg border border-line bg-card p-2 shadow-lg">
                     {[
                       { to: '/ledger', t: 'April EBITDA −15%', d: 'Open ledger exceptions' },
                       { to: '/receivables', t: '₹8.1 Cr older than 180', d: 'Open ageing' },
@@ -339,19 +387,48 @@ export function Shell() {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#03160f] text-[11px] font-semibold text-white">A</div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 border-t border-line px-4 py-2">
+          {showSearch && (
+            <div className="border-t border-line px-3 py-2 md:hidden">
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                autoFocus
+                placeholder="Search pages"
+                className="h-10 w-full rounded-lg border border-line bg-paper px-3 text-[16px] text-ink outline-none placeholder:text-mute"
+              />
+              {hits.length > 0 && (
+                <div className="mt-1 overflow-hidden rounded-lg border border-line bg-card py-1">
+                  {hits.map((h) => (
+                    <button
+                      key={h.to}
+                      type="button"
+                      className="block w-full px-3 py-2 text-left text-[13px] text-ink hover:bg-black/5 dark:hover:bg-white/10"
+                      onClick={() => {
+                        navTo(h.to)
+                        setQ('')
+                        setShowSearch(false)
+                      }}
+                    >
+                      {h.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2 border-t border-line px-3 py-2 sm:px-4">
             {chips.map((c) => (
               <Chip key={c.key} field={c.key} label={c.label} />
             ))}
-            <button type="button" onClick={reset} className="h-8 px-2 text-[12px] text-mute underline">
+            <button type="button" onClick={reset} className="h-8 shrink-0 px-2 text-[12px] text-mute underline">
               Clear slice
             </button>
-            <div className="relative ml-auto flex items-center gap-2">
+            <div className="relative flex shrink-0 items-center gap-2 sm:ml-auto">
               <button type="button" onClick={() => setShowViews((v) => !v)} className="h-8 rounded-lg px-2.5 text-[12px] text-mute hover:text-ink">
                 Saved views
               </button>
               {showViews && (
-                <div className="absolute right-28 top-9 z-30 w-56 rounded-lg border border-line bg-card p-2 shadow-lg">
+                <div className="absolute left-0 top-9 z-30 w-[min(14rem,calc(100vw-1.5rem))] rounded-lg border border-line bg-card p-2 shadow-lg sm:left-auto sm:right-0">
                   <button type="button" onClick={saveView} className="mb-1 w-full rounded-md bg-[#1b8a43] px-2 py-1.5 text-left text-[12px] text-white">
                     Save current slice
                   </button>
@@ -382,14 +459,14 @@ export function Shell() {
             </div>
           </div>
           {showFilters && (
-            <div className="grid gap-3 border-t border-line px-4 py-3 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="grid grid-cols-1 gap-2 border-t border-line px-3 py-3 sm:grid-cols-2 sm:px-4 lg:grid-cols-6">
               {chipsByPath['/'].concat(chipsByPath['/working-capital'], chipsByPath['/contracts']).map((c) => (
-                <Chip key={`all-${c.key}`} field={c.key} label={c.label} />
+                <Chip key={`all-${c.key}`} field={c.key} label={c.label} block />
               ))}
             </div>
           )}
           {showFx && (
-            <div className="flex flex-wrap items-center gap-3 border-t border-line px-4 py-3 text-[12px] text-ink">
+            <div className="flex flex-wrap items-center gap-3 border-t border-line px-3 py-3 text-[12px] text-ink sm:px-4">
               <span className="text-mute">Monthly INR per €1 — convert each month, then add for YTD. Sample until the client files the official rate.</span>
               {Object.entries(rates).map(([m, r]) => (
                 <label key={m} className="flex items-center gap-1">
@@ -399,7 +476,7 @@ export function Shell() {
                     step="0.1"
                     value={r}
                     onChange={(e) => setRate(m, Number(e.target.value) || r)}
-                    className="h-8 w-16 rounded-lg border border-line bg-card px-2 text-ink num"
+                    className="num h-10 w-16 rounded-lg border border-line bg-card px-2 text-[16px] text-ink sm:h-8 sm:text-[12px]"
                   />
                 </label>
               ))}
@@ -407,13 +484,15 @@ export function Shell() {
           )}
         </header>
 
-        <main className="p-5 lg:p-6">
+        <main className="min-w-0 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-5 lg:p-6">
           <Outlet />
         </main>
       </div>
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-50 rounded-lg bg-[#03160f] px-4 py-2 text-[13px] text-white shadow-lg">{toast}</div>
+        <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 right-3 z-50 rounded-lg bg-[#03160f] px-4 py-2 text-[13px] text-white shadow-lg sm:left-auto sm:right-5 sm:w-auto">
+          {toast}
+        </div>
       )}
     </div>
   )
@@ -555,12 +634,12 @@ function ProductMenu() {
   )
 }
 
-function IconBtn({ children, onClick }: { children: ReactNode; onClick?: () => void }) {
+function IconBtn({ children, onClick, className = '' }: { children: ReactNode; onClick?: () => void; className?: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-card text-mute hover:text-ink"
+      className={`flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-card text-mute hover:text-ink ${className}`}
     >
       {children}
     </button>

@@ -3,11 +3,12 @@ import { useSearchParams } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { ledger, ledgerTrend } from '../data'
 import { matchOmc, matchRegion, useFilters } from '../filters'
-import { Card, H, Kpi, PageHead, Pill, ScopeLine, Table, axis, chart } from '../ui'
+import { Card, ChartBox, H, Kpi, PageHead, Pill, ScopeLine, Table, axis, chart, plotMargin, tickShort, useNarrow } from '../ui'
 
 const kinds = ['All', 'Credit note', 'Neg. COGS', 'Reversal', 'DO NOT USE', '> ₹10 L'] as const
 
 export function Ledger() {
+  const narrow = useNarrow()
   const [params, setParams] = useSearchParams()
   const { filters, moneyLakh, registerExport, exportCsv, flash } = useFilters()
   const [owners, setOwners] = useState<Record<string, string>>({})
@@ -67,34 +68,35 @@ export function Ledger() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="By type and age" />
-          <div className="h-56">
-            <ResponsiveContainer>
+          <ChartBox className="h-52 sm:h-56">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={kinds.slice(1).map((name) => ({ name, v: counts[name] ?? 0 }))}
+                margin={plotMargin(narrow)}
               >
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="name" tick={axis()} />
-                <YAxis tick={axis()} />
+                <XAxis dataKey="name" tick={axis(narrow)} interval={0} angle={narrow ? -28 : 0} height={narrow ? 52 : 30} tickFormatter={tickShort(narrow ? 9 : 16)} />
+                <YAxis width={narrow ? 24 : 36} tick={axis(narrow)} />
                 <Tooltip />
                 <Bar dataKey="v" fill={chart.amber} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </div>
+          </ChartBox>
         </Card>
         <Card>
           <H title="Raised against resolved" />
-          <div className="h-56">
-            <ResponsiveContainer>
-              <LineChart data={ledgerTrend}>
+          <ChartBox className="h-52 sm:h-56">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={ledgerTrend} margin={plotMargin(narrow)}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="m" tick={axis()} />
-                <YAxis tick={axis()} />
+                <XAxis dataKey="m" tick={axis(narrow)} />
+                <YAxis width={narrow ? 24 : 36} tick={axis(narrow)} />
                 <Tooltip />
                 <Line dataKey="raised" stroke={chart.rose} strokeWidth={2} name="Raised" />
                 <Line dataKey="resolved" stroke={chart.green} strokeWidth={2} name="Resolved" />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </ChartBox>
         </Card>
       </div>
 
