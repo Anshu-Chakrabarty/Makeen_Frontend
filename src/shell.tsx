@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   currencies,
@@ -249,43 +249,7 @@ export function Shell() {
         <ProductMenu />
 
         <nav className="flex-1 overflow-y-auto px-2 pb-8">
-          {nav.map((s) => (
-            <div key={s.title} className="mb-4">
-              <div className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/35">{s.title}</div>
-              {s.items.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    `mb-0.5 flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[13px] ${
-                      isActive ? 'bg-[#1b8a43] font-medium text-white' : 'text-white/70 hover:bg-white/6 hover:text-white'
-                    }`
-                  }
-                >
-                  <span className="opacity-90">{item.icon}</span>
-                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                  {item.badge && <span className="rounded-full bg-white/15 px-1.5 text-[10px] font-semibold leading-4">{item.badge}</span>}
-                </NavLink>
-              ))}
-            </div>
-          ))}
-          <div>
-            <div className="px-3 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/35">Planned</div>
-            {planned.map((p) => (
-              <button
-                key={p.label}
-                type="button"
-                onClick={() => flash(`${p.label} is planned — not in this release.`)}
-                className="mb-0.5 flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13px] text-white/28 hover:bg-white/5"
-              >
-                <span>{p.icon}</span>
-                <span className="min-w-0 flex-1 truncate">{p.label}</span>
-                <span className="rounded-full bg-white/8 px-1.5 text-[9px] font-medium leading-4">planned</span>
-              </button>
-            ))}
-          </div>
+          <NavGroups pathname={loc.pathname} onNavigate={() => setOpen(false)} flash={flash} />
         </nav>
       </aside>
 
@@ -452,6 +416,102 @@ export function Shell() {
         <div className="fixed bottom-5 right-5 z-50 rounded-lg bg-[#03160f] px-4 py-2 text-[13px] text-white shadow-lg">{toast}</div>
       )}
     </div>
+  )
+}
+
+function loadOpenMenus() {
+  try {
+    const raw = localStorage.getItem('mein-nav')
+    if (raw) return JSON.parse(raw) as Record<string, boolean>
+  } catch {
+    /* keep defaults */
+  }
+  return { Performance: true, 'Cash & Stock': true, Contracts: true, Control: true, Planned: false }
+}
+
+function NavGroups({ pathname, onNavigate, flash }: { pathname: string; onNavigate: () => void; flash: (msg: string) => void }) {
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(loadOpenMenus)
+  const current = crumbs[pathname]?.[0]
+
+  useEffect(() => {
+    if (!current) return
+    setOpenMenus((prev) => {
+      if (prev[current]) return prev
+      const next = { ...prev, [current]: true }
+      localStorage.setItem('mein-nav', JSON.stringify(next))
+      return next
+    })
+  }, [current])
+
+  const toggle = (title: string) => {
+    setOpenMenus((prev) => {
+      const next = { ...prev, [title]: !prev[title] }
+      localStorage.setItem('mein-nav', JSON.stringify(next))
+      return next
+    })
+  }
+
+  return (
+    <>
+      {nav.map((s) => {
+        const expanded = openMenus[s.title] ?? current === s.title
+        return (
+          <div key={s.title} className="mb-1">
+            <button
+              type="button"
+              aria-expanded={expanded}
+              onClick={() => toggle(s.title)}
+              className="mb-0.5 flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45 hover:bg-white/5 hover:text-white/70"
+            >
+              <span className={`transition-transform ${expanded ? '' : '-rotate-90'}`}>{ic.chev}</span>
+              <span className="flex-1 truncate">{s.title}</span>
+            </button>
+            {expanded &&
+              s.items.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  onClick={onNavigate}
+                  className={({ isActive }) =>
+                    `mb-0.5 flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[13px] ${
+                      isActive ? 'bg-[#1b8a43] font-medium text-white' : 'text-white/70 hover:bg-white/6 hover:text-white'
+                    }`
+                  }
+                >
+                  <span className="opacity-90">{item.icon}</span>
+                  <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                  {item.badge && <span className="rounded-full bg-white/15 px-1.5 text-[10px] font-semibold leading-4">{item.badge}</span>}
+                </NavLink>
+              ))}
+          </div>
+        )
+      })}
+      <div className="mb-1">
+        <button
+          type="button"
+          aria-expanded={!!openMenus.Planned}
+          onClick={() => toggle('Planned')}
+          className="mb-0.5 flex h-8 w-full items-center gap-2 rounded-md px-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45 hover:bg-white/5 hover:text-white/70"
+        >
+          <span className={`transition-transform ${openMenus.Planned ? '' : '-rotate-90'}`}>{ic.chev}</span>
+          <span className="flex-1 truncate">Planned</span>
+        </button>
+        {openMenus.Planned &&
+          planned.map((p) => (
+            <button
+              key={p.label}
+              type="button"
+              onClick={() => flash(`${p.label} is planned — not in this release.`)}
+              className="mb-0.5 flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13px] text-white/28 hover:bg-white/5"
+            >
+              <span>{p.icon}</span>
+              <span className="min-w-0 flex-1 truncate">{p.label}</span>
+              <span className="rounded-full bg-white/8 px-1.5 text-[9px] font-medium leading-4">planned</span>
+            </button>
+          ))}
+      </div>
+    </>
   )
 }
 
