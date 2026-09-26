@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { ageTrend, ageing, customers, invoices } from '../data'
 import { matchOmc, matchRegion, useFilters } from '../filters'
-import { Card, ChartBox, H, Kpi, PageHead, ScopeLine, Table, axis, chart, plotMargin, tickShort, useNarrow } from '../ui'
+import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart } from '../ui'
 
 export function Receivables() {
-  const narrow = useNarrow()
   const { filters, money, registerExport, exportCsv, flash } = useFilters()
   const [owners, setOwners] = useState<Record<string, string>>({})
   const custs = customers.filter((c) => matchOmc(c.name, filters.omc))
@@ -44,12 +43,12 @@ export function Receivables() {
       <div className="mt-4 grid gap-3 xl:grid-cols-2">
         <Card>
           <H title="External debtors ageing" hint="Severity ramps with age. The dashed band marks the 91+ watch zone." />
-          <ChartBox className="h-52 sm:h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ageing} margin={plotMargin(narrow)}>
+          <div className="h-56">
+            <ResponsiveContainer>
+              <BarChart data={ageing}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="name" tick={axis(narrow)} interval={0} angle={narrow ? -40 : -12} height={narrow ? 64 : 50} tickFormatter={tickShort(narrow ? 10 : 18)} />
-                <YAxis width={narrow ? 28 : 40} tick={axis(narrow)} />
+                <XAxis dataKey="name" tick={axis()} interval={0} angle={-12} height={50} />
+                <YAxis tick={axis()} />
                 <Tooltip />
                 <Bar dataKey="v" radius={[4, 4, 0, 0]}>
                   {ageing.map((a, i) => (
@@ -58,43 +57,43 @@ export function Receivables() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </ChartBox>
+          </div>
           <p className="mt-3 text-[12px] text-mute">Reconciliation: External ₹43.8 Cr + Contract WIP ₹2.2 Cr + Internal ₹1.8 Cr = Gross book ₹45.7 Cr. Provision ₹2.5 Cr is shown separately.</p>
         </Card>
         <Card>
           <H title="Ageing trend" hint="Whether the 180+ block is being worked down, it is not." />
-          <ChartBox className="h-52 sm:h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={ageTrend} margin={plotMargin(narrow)}>
+          <div className="h-56">
+            <ResponsiveContainer>
+              <AreaChart data={ageTrend}>
                 <CartesianGrid stroke={chart.grid} vertical={false} />
-                <XAxis dataKey="m" tick={axis(narrow)} />
-                <YAxis width={narrow ? 28 : 40} tick={axis(narrow)} />
+                <XAxis dataKey="m" tick={axis()} />
+                <YAxis tick={axis()} />
                 <Tooltip />
                 <Area dataKey="current" stackId="a" fill="#16a34a55" stroke={chart.green} name="Current / 0–90" />
                 <Area dataKey="mid" stackId="a" fill="#b4530955" stroke={chart.amber} name="91–180" />
                 <Area dataKey="old" stackId="a" fill="#dc262655" stroke={chart.rose} name="Older than 180" />
               </AreaChart>
             </ResponsiveContainer>
-          </ChartBox>
+          </div>
           <p className="mt-3 text-[12px] text-mute">The 180+ stock grew every month until February, from ₹6.2 Cr to ₹8.1 Cr.</p>
         </Card>
       </div>
 
       <Card className="mt-4">
         <H title="Customer concentration" hint="Bars are 91+ exposure. The line is the cumulative share. Three accounts carry the whole overdue book." />
-        <ChartBox className="h-52 sm:h-56">
-          <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={custs} margin={plotMargin(narrow)}>
+        <div className="h-56">
+          <ResponsiveContainer>
+            <ComposedChart data={custs}>
               <CartesianGrid stroke={chart.grid} vertical={false} />
-              <XAxis dataKey="name" tick={axis(narrow)} interval={0} angle={narrow ? -20 : 0} height={narrow ? 40 : 30} />
-              <YAxis yAxisId="b" width={narrow ? 28 : 40} tick={axis(narrow)} />
-              <YAxis yAxisId="p" orientation="right" width={narrow ? 24 : 40} unit="%" tick={axis(narrow)} />
+              <XAxis dataKey="name" tick={axis()} />
+              <YAxis yAxisId="b" tick={axis()} />
+              <YAxis yAxisId="p" orientation="right" unit="%" tick={axis()} />
               <Tooltip />
               <Bar yAxisId="b" dataKey="overdue" fill={chart.amber} barSize={48} name="91+ exposure" radius={[4, 4, 0, 0]} />
               <Line yAxisId="p" dataKey="share" stroke={chart.blue} strokeWidth={2} name="Cumulative %" />
             </ComposedChart>
           </ResponsiveContainer>
-        </ChartBox>
+        </div>
       </Card>
 
       <Card className="mt-4">

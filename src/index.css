@@ -3,7 +3,7 @@
 @custom-variant dark (&:where(.dark *));
 
 @theme {
-  --font-sans: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --color-side: #042018;
   --color-side-2: #063024;
   --color-green: #16a34a;
@@ -34,28 +34,14 @@ html,
 body,
 #root {
   min-height: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-#root,
-main {
-  min-width: 0;
-}
-
-.recharts-responsive-container,
-.recharts-wrapper,
-.recharts-surface {
-  max-width: 100%;
 }
 
 body {
   margin: 0;
-  font-family: "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
   background: var(--color-paper);
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
-  word-spacing: 0.04em;
 }
 
 html.dark body {

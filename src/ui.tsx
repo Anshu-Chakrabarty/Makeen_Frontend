@@ -1,18 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useFilters } from './filters'
-
-export function useNarrow(bp = 640) {
-  const [n, setN] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${bp - 1}px)`)
-    const apply = () => setN(mq.matches)
-    apply()
-    mq.addEventListener('change', apply)
-    return () => mq.removeEventListener('change', apply)
-  }, [bp])
-  return n
-}
 
 export function cr(n: number, d = 1) {
   const sign = n < 0 ? '−' : ''
@@ -39,10 +27,10 @@ export function PageHead({
   note: string
 }) {
   return (
-    <div className="mb-4 flex flex-wrap items-start justify-between gap-3 sm:mb-5">
-      <div className="min-w-0 flex-1">
+    <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+      <div>
         <div className="text-[10px] font-semibold uppercase tracking-wide text-mute">{kicker}</div>
-        <h1 className="mt-1 break-words text-[20px] font-semibold text-ink sm:text-[28px]">{title}</h1>
+        <h1 className="mt-1 text-[28px] font-semibold text-ink">{title}</h1>
         <p className="mt-1 max-w-2xl text-[13px] text-mute">{note}</p>
       </div>
       <ExportBtn />
@@ -82,7 +70,7 @@ export function Alert({
   return (
     <Link
       to={to}
-      className="flex min-w-0 gap-3 rounded-2xl border border-line bg-card p-4 hover:border-ink/20"
+      className="flex gap-3 rounded-2xl border border-line bg-card p-4 hover:border-ink/20"
     >
       <i className={`mt-1 h-8 w-1 rounded-full ${bar}`} />
       <div>
@@ -105,23 +93,23 @@ export function Kpi({
   tone?: 'rose' | 'ok'
 }) {
   return (
-    <div className="min-w-0 rounded-2xl border border-line bg-card p-4">
+    <div className="rounded-2xl border border-line bg-card p-4">
       <div className="text-[11px] font-medium uppercase tracking-wide text-mute">{label}</div>
       <div
-        className={`num mt-2 break-words text-[20px] font-semibold sm:text-[26px] ${
+        className={`num mt-2 text-[26px] font-semibold ${
           tone === 'rose' ? 'text-rose' : tone === 'ok' ? 'text-green' : 'text-ink'
         }`}
       >
         {value}
       </div>
-      {note && <div className="mt-1 break-words text-[12px] text-mute">{note}</div>}
+      {note && <div className="mt-1 text-[12px] text-mute">{note}</div>}
     </div>
   )
 }
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`min-w-0 rounded-2xl border border-line bg-card p-3 sm:p-5 ${className}`}>
+    <div className={`rounded-2xl border border-line bg-card p-5 ${className}`}>
       {children}
     </div>
   )
@@ -178,13 +166,13 @@ export function Tabs({
   onChange: (id: string) => void
 }) {
   return (
-    <div className="-mx-1 mb-5 flex gap-1 overflow-x-auto overscroll-x-contain rounded-xl bg-black/5 p-1 [scrollbar-width:none] dark:bg-white/10 sm:flex-wrap [&::-webkit-scrollbar]:hidden">
+    <div className="mb-5 flex flex-wrap gap-1 rounded-xl bg-black/5 p-1 dark:bg-white/10">
       {items.map((t) => (
         <button
           key={t.id}
           type="button"
           onClick={() => onChange(t.id)}
-          className={`h-8 shrink-0 rounded-lg px-3 text-[13px] font-medium whitespace-nowrap ${
+          className={`h-8 rounded-lg px-3 text-[13px] font-medium ${
             value === t.id ? 'bg-card text-ink shadow-sm' : 'text-mute hover:text-ink'
           }`}
         >
@@ -217,8 +205,8 @@ export function Table({
   foot?: ReactNode[]
 }) {
   return (
-    <div className="-mx-1 overflow-x-auto overscroll-x-contain [scrollbar-width:thin]">
-      <table className="w-full min-w-[520px] text-left text-[12px] sm:min-w-[640px] sm:text-[13px]">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[640px] text-left text-[13px]">
         <thead>
           <tr className="text-[10px] font-semibold uppercase tracking-wide text-mute">
             {cols.map((c) => (
@@ -267,21 +255,6 @@ export const chart = {
   grey: '#94a3b8',
 }
 
-export function axis(narrow = false) {
-  return { fill: '#6b7280', fontSize: narrow ? 9 : 11 }
-}
-
-export function plotMargin(narrow: boolean, left = 16) {
-  return { top: 8, right: narrow ? 2 : 12, bottom: narrow ? 2 : 8, left: narrow ? 2 : left }
-}
-
-export function tickShort(n = 14) {
-  return (v: string | number) => {
-    const s = String(v)
-    return s.length > n ? `${s.slice(0, n - 1)}…` : s
-  }
-}
-
-export function ChartBox({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`h-52 w-full min-w-0 overflow-hidden sm:h-64 ${className}`}>{children}</div>
+export function axis() {
+  return { fill: '#6b7280', fontSize: 11 }
 }
