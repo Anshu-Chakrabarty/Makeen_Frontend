@@ -12,12 +12,13 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { mix, plants } from '../data'
 import { matchRegion, useFilters } from '../filters'
+import { useLive } from '../live'
 import { Alert, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, useNarrow, vPad, vW } from '../ui'
 
 export function Overview() {
   const narrow = useNarrow()
+  const { mix, plants } = useLive().data
   const { filters, money, moneyYtd, monthSlice, registerExport, exportCsv, rates } = useFilters()
   const shownMix = filters.segment === 'All' ? mix : mix.filter((s) => s.name === filters.segment)
   const shownPlants = plants.filter((p) => matchRegion(p.name, filters.region) && (filters.plant === 'All' || p.name === filters.plant))

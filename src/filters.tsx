@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react'
-import { monthly, plants as plantRows } from './data'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useLive } from './live'
 
 export type Currency = 'INR' | 'EUR' | 'Both'
 
@@ -90,7 +90,7 @@ type Ctx = {
   reset: () => void
   rates: Record<string, number>
   setRate: (month: string, rate: number) => void
-  monthSlice: typeof monthly
+  monthSlice: { m: string; rev: number; gp: number; ebitda: number; ebitdaPct: number; np: number; rate: number }[]
   scale: number
   money: (inrCr: number, month?: string) => string
   moneyLakh: (inrLakh: number, month?: string) => string
@@ -105,6 +105,10 @@ type Ctx = {
 const FilterCtx = createContext<Ctx | null>(null)
 
 export function FilterProvider({ children }: { children: ReactNode }) {
+  const { data } = useLive()
+  const monthly = data.monthly
+  const plantRows = data.plants
+  const mix = data.mix
   const [filters, setFilters] = useState<Filters>(() => {
     try {
       const raw = localStorage.getItem('mein-filters')
@@ -114,6 +118,15 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     }
   })
   const [rates, setRates] = useState(defaultRates)
+  useEffect(() => {
+    setRates((prev) => {
+      const next = { ...prev }
+      monthly.forEach((r) => {
+        if (r.rate) next[r.m] = r.rate
+      })
+      return next
+    })
+  }, [monthly])
   const exportRef = useRef<() => void>(() => {})
   const [toast, setToast] = useState('')
 
@@ -124,9 +137,9 @@ export function FilterProvider({ children }: { children: ReactNode }) {
 
   const monthSlice = useMemo(() => {
     if (filters.period === 'ytd') return monthly
-    const m = monthKey[filters.period] ?? 'Jul'
+    const m = monthKey[filters.period] ?? monthly[monthly.length - 1]?.m ?? 'Jul'
     return monthly.filter((r) => r.m === m)
-  }, [filters.period])
+  }, [filters.period, monthly])
 
   const scale = useMemo(() => {
     let s = 1
@@ -137,18 +150,13 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       s *= den ? num / den : 1
     }
     if (filters.segment !== 'All') {
-      const map: Record<string, number> = {
-        Service: 89.5,
-        Projects: 36.5,
-        'Parts & Components': 22.7,
-        FM: 17.3,
-        'Gas equipment': 3.6,
-      }
-      s *= (map[filters.segment] ?? 131) / 131
+      const total = mix.reduce((a, r) => a + r.value, 0)
+      const row = mix.find((r) => r.name === filters.segment)
+      s *= total && row ? row.value / total : 1
     }
     if (filters.year === '2025') s *= 0.92
     return s
-  }, [filters, monthSlice])
+  }, [filters, plantRows, mix])
 
   const money = useCallback((inrCr: number, month?: string) => {
     const m = month ?? monthKey[filters.period] ?? 'Jul'

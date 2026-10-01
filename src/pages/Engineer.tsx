@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts'
-import { engineers } from '../data'
 import { matchRegion, useFilters } from '../filters'
+import { useLive } from '../live'
 import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, useNarrow, vPad, vW } from '../ui'
 
 export function Engineer() {
   const narrow = useNarrow()
+  const { engineers } = useLive().data
   const { filters, moneyLakh, registerExport, exportCsv, flash } = useFilters()
   const rows = engineers.filter((e) => {
     const plants = e.plants.split(', ')

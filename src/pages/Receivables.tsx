@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { ageTrend, ageing, customers, invoices } from '../data'
 import { matchOmc, matchRegion, useFilters } from '../filters'
+import { useLive } from '../live'
 import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, useNarrow } from '../ui'
 
 const shortAge: Record<string, string> = {
@@ -15,6 +15,7 @@ const shortAge: Record<string, string> = {
 
 export function Receivables() {
   const narrow = useNarrow()
+  const { ageTrend, ageing, customers, invoices } = useLive().data
   const { filters, money, registerExport, exportCsv, flash } = useFilters()
   const [owners, setOwners] = useState<Record<string, string>>({})
   const custs = customers.filter((c) => matchOmc(c.name, filters.omc))

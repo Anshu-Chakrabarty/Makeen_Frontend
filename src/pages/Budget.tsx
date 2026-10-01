@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { bridge, costLines } from '../data'
 import { useFilters } from '../filters'
+import { useLive } from '../live'
 import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 const steps = [
@@ -32,6 +32,7 @@ const shortStep: Record<string, string> = {
 export function Budget() {
   const narrow = useNarrow()
   const nav = useNavigate()
+  const { bridge, costLines } = useLive().data
   const { filters, money, moneyLakh, registerExport, exportCsv } = useFilters()
   const bars = bridge.map((b, i) => ({
     ...b,

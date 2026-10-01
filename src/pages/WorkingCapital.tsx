@@ -15,8 +15,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { cccTrend, cycle, originShare, returnLines, returnReasons, returnWh, returnsMonth, twc, warehouses } from '../data'
 import { matchOmc, useFilters } from '../filters'
+import { useLive } from '../live'
 import { Banner, Card, H, Kpi, PageHead, Pill, ScopeLine, Table, Tabs, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 const tabs = [
@@ -58,6 +58,7 @@ export function WorkingCapital() {
 
 function Cycle() {
   const narrow = useNarrow()
+  const { cycle, cccTrend } = useLive().data
   const { registerExport, exportCsv } = useFilters()
   useEffect(() => {
     registerExport(() =>
@@ -67,7 +68,7 @@ function Cycle() {
         cycle.map((c) => [c.name, c.days, c.target, c.days - c.target]),
       ),
     )
-  }, [registerExport, exportCsv])
+  }, [cycle, registerExport, exportCsv])
 
   return (
     <>
@@ -128,6 +129,7 @@ function Cycle() {
 
 function Twc() {
   const narrow = useNarrow()
+  const { twc } = useLive().data
   const { filters, money, moneyYtd, monthSlice, registerExport, exportCsv } = useFilters()
   const slice = twc.filter((r) => monthSlice.some((m) => m.m === r.m))
   const last = slice[slice.length - 1] ?? twc[twc.length - 1]
@@ -185,6 +187,7 @@ function Twc() {
 }
 
 function useWarehouseSlice() {
+  const { warehouses } = useLive().data
   const { filters } = useFilters()
   return warehouses.filter((w) => {
     if (filters.warehouse === 'scope' && !w.inScope) return false
@@ -196,6 +199,7 @@ function useWarehouseSlice() {
 
 function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) => void }) {
   const narrow = useNarrow()
+  const { warehouses, originShare } = useLive().data
   const { filters, set, money, registerExport, exportCsv, monthSlice } = useFilters()
   const shown = useWarehouseSlice()
   const scoped = warehouses.filter((w) => w.inScope)
@@ -373,6 +377,7 @@ function Inventory({ invView, setInv }: { invView: string; setInv: (v: string) =
 
 function Returns() {
   const narrow = useNarrow()
+  const { returnLines, returnWh, warehouses, returnsMonth, returnReasons } = useLive().data
   const { filters, moneyLakh, registerExport, exportCsv, flash, monthSlice } = useFilters()
   const lines = returnLines.filter((r) => matchOmc(r.cust, filters.omc) && (filters.origin === 'All' || warehouses.find((w) => w.name === r.wh)?.origin === filters.origin))
   const shownWh = returnWh.filter((w) => {

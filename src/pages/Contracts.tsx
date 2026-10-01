@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from 'recharts'
-import { contracts } from '../data'
 import { useFilters } from '../filters'
+import { useLive } from '../live'
 import { Banner, Card, H, Kpi, PageHead, Pill, ScopeLine, Table, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 export function Contracts() {
   const narrow = useNarrow()
+  const { contracts } = useLive().data
   const { filters, set, money, moneyLakh, registerExport, exportCsv, flash } = useFilters()
   const rows = contracts.filter((c) => {
     if (filters.region !== 'All' && c.region !== filters.region) return false

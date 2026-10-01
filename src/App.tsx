@@ -6,17 +6,21 @@ import { Ledger } from './pages/Ledger'
 import { Orders } from './pages/Orders'
 import { Overview } from './pages/Overview'
 import { Receivables } from './pages/Receivables'
+import { Upload } from './pages/Upload'
 import { Variance } from './pages/Variance'
 import { WorkingCapital } from './pages/WorkingCapital'
 import { Shell } from './shell'
 import { FilterProvider } from './filters'
+import { LiveProvider } from './live'
 import { ThemeProvider } from './theme'
 
 export default function App() {
   return (
     <ThemeProvider>
+      <LiveProvider>
       <FilterProvider>
       <Routes>
+        <Route path="/upload" element={<Upload />} />
         <Route element={<Shell />}>
           <Route path="/" element={<Overview />} />
           <Route path="/budget" element={<Budget />} />
@@ -31,6 +35,7 @@ export default function App() {
         </Route>
       </Routes>
       </FilterProvider>
+      </LiveProvider>
     </ThemeProvider>
   )
 }

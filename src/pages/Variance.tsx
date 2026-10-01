@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { yearMonths, varianceExceptions, varianceGrid } from '../data'
+import { yearMonths } from '../data'
 import { matchOmc, useFilters } from '../filters'
+import { useLive } from '../live'
 import { Banner, Card, H, Kpi, PageHead, ScopeLine, Table } from '../ui'
 
 function tone(v: number, future: boolean) {
@@ -14,6 +15,7 @@ function tone(v: number, future: boolean) {
 }
 
 export function Variance() {
+  const { varianceExceptions, varianceGrid } = useLive().data
   const { filters, set, moneyLakh, registerExport, exportCsv, flash } = useFilters()
   const grid = varianceGrid.filter((r) => {
     if (filters.region !== 'All' && r.region !== filters.region) return false

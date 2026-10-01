@@ -16,6 +16,7 @@ import {
 } from './filters'
 import { ic } from './icons'
 import { searchIndex } from './search'
+import { useLive } from './live'
 import { useTheme } from './theme'
 
 type Item = { to: string; label: string; end?: boolean; icon: ReactNode; badge?: string }
@@ -48,6 +49,7 @@ const nav: { title: string; items: Item[] }[] = [
     items: [
       { to: '/variance', label: 'Budget Variance', icon: ic.variance },
       { to: '/ledger', label: 'Ledger Exceptions', icon: ic.ledger, badge: '8' },
+      { to: '/upload', label: 'Excel upload', icon: ic.export },
     ],
   },
 ]
@@ -198,6 +200,7 @@ function Chip({ field, label }: { field: keyof Filters; label: string }) {
 
 export function Shell() {
   const { dark, toggle } = useTheme()
+  const { meta } = useLive()
   const { filters, apply, reset, runExport, toast, flash, rates, setRate } = useFilters()
   const loc = useLocation()
   const navTo = useNavigate()
@@ -408,6 +411,15 @@ export function Shell() {
         </header>
 
         <main className="min-w-0 p-3 sm:p-5 lg:p-6">
+          {meta.source !== 'sample' && (
+            <div className="mb-4 rounded-xl border border-line bg-card px-3 py-2 text-[12px] text-mute">
+              Live pack · {meta.file}
+              {meta.at ? ` · ${new Date(meta.at).toLocaleString('en-IN')}` : ''} ·{' '}
+              <a href="/upload" className="underline">
+                replace Excel
+              </a>
+            </div>
+          )}
           <Outlet />
         </main>
       </div>

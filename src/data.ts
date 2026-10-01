@@ -263,3 +263,63 @@ export const ledgerTrend = months.map((m, i) => ({
 }))
 
 void plantNames
+
+export type AppData = {
+  monthly: typeof monthly
+  mix: typeof mix
+  plants: typeof plants
+  bridge: typeof bridge
+  costLines: typeof costLines
+  orders: typeof orders
+  intakeTrend: typeof intakeTrend
+  ageing: typeof ageing
+  ageTrend: typeof ageTrend
+  customers: typeof customers
+  invoices: typeof invoices
+  cycle: typeof cycle
+  cccTrend: typeof cccTrend
+  twc: typeof twc
+  warehouses: typeof warehouses
+  originShare: typeof originShare
+  returnsMonth: typeof returnsMonth
+  returnReasons: typeof returnReasons
+  returnWh: typeof returnWh
+  returnLines: typeof returnLines
+  contracts: typeof contracts
+  engineers: typeof engineers
+  varianceGrid: typeof varianceGrid
+  varianceExceptions: typeof varianceExceptions
+  ledger: typeof ledger
+  ledgerTrend: typeof ledgerTrend
+}
+
+export function sampleData(): AppData {
+  return {
+    monthly,
+    mix,
+    plants,
+    bridge,
+    costLines,
+    orders,
+    intakeTrend,
+    ageing,
+    ageTrend,
+    customers,
+    invoices,
+    cycle,
+    cccTrend,
+    twc,
+    warehouses,
+    originShare,
+    returnsMonth,
+    returnReasons,
+    returnWh,
+    returnLines,
+    contracts,
+    engineers,
+    varianceGrid,
+    varianceExceptions,
+    ledger,
+    ledgerTrend,
+  }
+}

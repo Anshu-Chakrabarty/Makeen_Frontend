@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { ledger, ledgerTrend } from '../data'
 import { matchOmc, matchRegion, useFilters } from '../filters'
+import { useLive } from '../live'
 import { Card, H, Kpi, PageHead, Pill, ScopeLine, Table, axis, chart, hPad, nW, shortTick, useNarrow } from '../ui'
 
 const kinds = ['All', 'Credit note', 'Neg. COGS', 'Reversal', 'DO NOT USE', '> ₹10 L'] as const
 
 export function Ledger() {
   const narrow = useNarrow()
+  const { ledger, ledgerTrend } = useLive().data
   const [params, setParams] = useSearchParams()
   const { filters, moneyLakh, registerExport, exportCsv, flash } = useFilters()
   const [owners, setOwners] = useState<Record<string, string>>({})

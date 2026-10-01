@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { intakeTrend, orders } from '../data'
 import { useFilters } from '../filters'
+import { useLive } from '../live'
 import { Card, H, Kpi, PageHead, ScopeLine, Table, axis, chart, hPad, nW, shortTick, useNarrow, vPad, vW } from '../ui'
 
 export function Orders() {
   const narrow = useNarrow()
+  const { intakeTrend, orders } = useLive().data
   const { filters, money, registerExport, exportCsv, monthSlice } = useFilters()
   const shown = filters.segment === 'All' ? orders : orders.filter((o) => o.name.startsWith(filters.segment) || o.reserved)
   const work = shown.filter((o) => !o.reserved)
