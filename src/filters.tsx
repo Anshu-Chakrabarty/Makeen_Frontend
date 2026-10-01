@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useLive } from './live'
+import { closeMonthNames, useLive } from './live'
 
 export type Currency = 'INR' | 'EUR' | 'Both'
 
@@ -37,6 +37,34 @@ export const periods = [
   { value: 'may', label: 'May' },
   { value: 'apr', label: 'April' },
 ]
+
+const monthKey: Record<string, string> = {
+  ytd: 'Jul',
+  jan: 'Jan',
+  feb: 'Feb',
+  mar: 'Mar',
+  apr: 'Apr',
+  may: 'May',
+  jun: 'Jun',
+  jul: 'Jul',
+  aug: 'Aug',
+  sep: 'Sep',
+  oct: 'Oct',
+  nov: 'Nov',
+  dec: 'Dec',
+}
+
+function periodsFromMonthly(rows: { m: string }[]) {
+  if (!rows.length) return periods
+  const last = rows[rows.length - 1]?.m ?? 'Jul'
+  return [
+    { value: 'ytd', label: `YTD ${closeMonthNames[last] ?? last}` },
+    ...[...rows].reverse().map((r) => ({
+      value: r.m.toLowerCase().slice(0, 3),
+      label: closeMonthNames[r.m] ?? r.m,
+    })),
+  ]
+}
 export const regions = ['All', 'North', 'South', 'East', 'West']
 export const omcs = ['All', 'IOCL', 'BPCL', 'HPCL']
 export const segments = ['All', 'Service', 'Projects', 'Parts & Components', 'FM', 'Gas equipment']
@@ -77,9 +105,12 @@ const defaultRates: Record<string, number> = {
   May: 95.1,
   Jun: 96.4,
   Jul: 97.2,
+  Aug: 97.2,
+  Sep: 97.2,
+  Oct: 97.2,
+  Nov: 97.2,
+  Dec: 97.2,
 }
-
-const monthKey: Record<string, string> = { ytd: 'Jul', jul: 'Jul', jun: 'Jun', may: 'May', apr: 'Apr' }
 
 export const plantOpts = ['All', ...Object.keys(plantRegion)]
 
@@ -100,15 +131,22 @@ type Ctx = {
   runExport: () => void
   toast: string
   flash: (msg: string) => void
+  periods: { value: string; label: string }[]
+  years: string[]
 }
 
 const FilterCtx = createContext<Ctx | null>(null)
 
 export function FilterProvider({ children }: { children: ReactNode }) {
-  const { data } = useLive()
+  const { data, active, packs } = useLive()
   const monthly = data.monthly
   const plantRows = data.plants
   const mix = data.mix
+  const periodOpts = useMemo(() => periodsFromMonthly(monthly), [monthly])
+  const yearOpts = useMemo(
+    () => Array.from(new Set([...years, ...packs.map((p) => p.year)])).sort(),
+    [packs],
+  )
   const [filters, setFilters] = useState<Filters>(() => {
     try {
       const raw = localStorage.getItem('mein-filters')
@@ -117,6 +155,18 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       return defaults
     }
   })
+  const skipCloseSync = useRef(true)
+  useEffect(() => {
+    if (skipCloseSync.current) {
+      skipCloseSync.current = false
+      return
+    }
+    setFilters((prev) => {
+      const next = { ...prev, year: active.year, period: 'ytd' }
+      localStorage.setItem('mein-filters', JSON.stringify(next))
+      return next
+    })
+  }, [active.id, active.year])
   const [rates, setRates] = useState(defaultRates)
   useEffect(() => {
     setRates((prev) => {
@@ -138,7 +188,8 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   const monthSlice = useMemo(() => {
     if (filters.period === 'ytd') return monthly
     const m = monthKey[filters.period] ?? monthly[monthly.length - 1]?.m ?? 'Jul'
-    return monthly.filter((r) => r.m === m)
+    const hit = monthly.filter((r) => r.m === m)
+    return hit.length ? hit : monthly.slice(-1)
   }, [filters.period, monthly])
 
   const scale = useMemo(() => {
@@ -159,24 +210,26 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   }, [filters, plantRows, mix])
 
   const money = useCallback((inrCr: number, month?: string) => {
-    const m = month ?? monthKey[filters.period] ?? 'Jul'
+    const close = monthly[monthly.length - 1]?.m ?? 'Jul'
+    const m = month ?? (filters.period === 'ytd' ? close : monthKey[filters.period] ?? close)
     const rate = rates[m] ?? 97.2
     const v = inrCr * scale
     if (filters.currency === 'EUR') return `€${(v / (rate / 10)).toFixed(2)}m`
     if (filters.currency === 'Both') return `₹${v.toFixed(1)} Cr  ·  €${(v / (rate / 10)).toFixed(2)}m`
     const sign = v < 0 ? '−' : ''
     return `${sign}₹${Math.abs(v).toFixed(1)} Cr`
-  }, [filters.period, filters.currency, rates, scale])
+  }, [filters.period, filters.currency, rates, scale, monthly])
 
   const moneyLakh = useCallback((inrLakh: number, month?: string) => {
-    const m = month ?? monthKey[filters.period] ?? 'Jul'
+    const close = monthly[monthly.length - 1]?.m ?? 'Jul'
+    const m = month ?? (filters.period === 'ytd' ? close : monthKey[filters.period] ?? close)
     const rate = rates[m] ?? 97.2
     const v = inrLakh * scale
     if (filters.currency === 'EUR') return `€${((v * 100000) / rate / 1000).toFixed(1)}k`
     if (filters.currency === 'Both') return `₹${v.toFixed(1)} L  ·  €${((v * 100000) / rate / 1000).toFixed(1)}k`
     const sign = v < 0 ? '−' : ''
     return `${sign}₹${Math.abs(v).toFixed(1)} L`
-  }, [filters.period, filters.currency, rates, scale])
+  }, [filters.period, filters.currency, rates, scale, monthly])
 
   const moneyYtd = useCallback((rows: { v: number; m: string }[]) => {
     const inr = rows.reduce((s, r) => s + r.v, 0) * scale
@@ -242,6 +295,8 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     runExport,
     toast,
     flash,
+    periods: periodOpts,
+    years: yearOpts,
   }
 
   return <FilterCtx.Provider value={value}>{children}</FilterCtx.Provider>

@@ -10,5 +10,5 @@ export const searchIndex = [
   { q: 'engineer cost hold', to: '/engineer', label: 'Engineer Cost' },
   { q: 'variance heatmap lucknow april', to: '/variance', label: 'Budget Variance' },
   { q: 'ledger exception credit note reversal', to: '/ledger', label: 'Ledger Exceptions' },
-  { q: 'upload excel workbook next month data', to: '/upload', label: 'Excel upload' },
+  { q: 'upload excel workbook next month data stored months archive', to: '/upload', label: 'Excel upload' },
 ]

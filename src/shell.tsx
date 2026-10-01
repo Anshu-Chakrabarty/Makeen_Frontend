@@ -4,13 +4,11 @@ import {
   currencies,
   omcs,
   origins,
-  periods,
   regions,
   reporteds,
   segments,
   useFilters,
   warehouseOpts,
-  years,
   plantOpts,
   type Filters,
 } from './filters'
@@ -140,9 +138,9 @@ const chipsByPath: Record<string, { key: keyof Filters; label: string }[]> = {
   ],
 }
 
-function options(key: keyof Filters) {
-  if (key === 'year') return years.map((v) => ({ value: v, label: v }))
-  if (key === 'period') return periods
+function options(key: keyof Filters, periodOpts: { value: string; label: string }[], yearOpts: string[]) {
+  if (key === 'year') return yearOpts.map((v) => ({ value: v, label: v }))
+  if (key === 'period') return periodOpts
   if (key === 'region') return regions.map((v) => ({ value: v, label: v === 'All' ? 'All regions' : v }))
   if (key === 'omc') return omcs.map((v) => ({ value: v, label: v === 'All' ? 'All customers' : v }))
   if (key === 'segment') return segments.map((v) => ({ value: v, label: v === 'All' ? 'All lines' : v }))
@@ -155,9 +153,9 @@ function options(key: keyof Filters) {
 }
 
 function Chip({ field, label }: { field: keyof Filters; label: string }) {
-  const { filters, set } = useFilters()
+  const { filters, set, periods: periodOpts, years: yearOpts } = useFilters()
   const [open, setOpen] = useState(false)
-  const opts = options(field)
+  const opts = options(field, periodOpts, yearOpts)
   const current = opts.find((o) => o.value === filters[field])?.label ?? filters[field]
   return (
     <div className="relative">
@@ -200,8 +198,8 @@ function Chip({ field, label }: { field: keyof Filters; label: string }) {
 
 export function Shell() {
   const { dark, toggle } = useTheme()
-  const { meta } = useLive()
-  const { filters, apply, reset, runExport, toast, flash, rates, setRate } = useFilters()
+  const { meta, packs, active, select, step } = useLive()
+  const { filters, apply, reset, runExport, toast, flash, rates, setRate, periods: periodOpts } = useFilters()
   const loc = useLocation()
   const navTo = useNavigate()
   const crumb = crumbs[loc.pathname] ?? ['Finance', '']
@@ -304,7 +302,7 @@ export function Shell() {
                 className="hidden items-center gap-1.5 rounded-full border border-line bg-card px-2.5 py-1 text-[11px] text-mute sm:flex"
               >
                 <i className="h-1.5 w-1.5 rounded-full bg-[#1b8a43]" />
-                Vena · {filters.year} · {periods.find((p) => p.value === filters.period)?.label} · rate ₹{rates.Jul}=€1
+                Vena · {active.month} {active.year} · {periodOpts.find((p) => p.value === filters.period)?.label} · rate ₹{rates[active.month] ?? rates.Jul}=€1
               </button>
               <IconBtn onClick={toggle}>{dark ? ic.sun : ic.moon}</IconBtn>
               <div className="relative">
@@ -411,15 +409,34 @@ export function Shell() {
         </header>
 
         <main className="min-w-0 p-3 sm:p-5 lg:p-6">
-          {meta.source !== 'sample' && (
-            <div className="mb-4 rounded-xl border border-line bg-card px-3 py-2 text-[12px] text-mute">
-              Live pack · {meta.file}
-              {meta.at ? ` · ${new Date(meta.at).toLocaleString('en-IN')}` : ''} ·{' '}
-              <a href="/upload" className="underline">
-                replace Excel
-              </a>
-            </div>
-          )}
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-line bg-card px-3 py-2 text-[12px] text-mute">
+            <span>Stored months</span>
+            <button type="button" className="h-7 rounded-lg border border-line px-2 text-ink disabled:opacity-40" disabled={packs[0]?.id === active.id} onClick={() => step(-1)}>
+              Prev
+            </button>
+            {packs.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => select(p.id)}
+                className={`h-7 rounded-full px-2.5 font-medium ${
+                  p.id === active.id ? 'bg-[#1b8a43] text-white' : 'border border-line text-ink'
+                }`}
+              >
+                {p.month} {p.year}
+              </button>
+            ))}
+            <button type="button" className="h-7 rounded-lg border border-line px-2 text-ink disabled:opacity-40" disabled={packs.at(-1)?.id === active.id} onClick={() => step(1)}>
+              Next
+            </button>
+            <span className="min-w-0 truncate">
+              {meta.file}
+              {meta.at ? ` · ${new Date(meta.at).toLocaleString('en-IN')}` : ''}
+            </span>
+            <a href="/upload" className="underline">
+              add next month
+            </a>
+          </div>
           <Outlet />
         </main>
       </div>
