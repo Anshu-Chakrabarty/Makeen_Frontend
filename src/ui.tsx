@@ -36,16 +36,41 @@ export function PageHead({
 }: {
   kicker: string
   title: string
-  note: string
+  note: ReactNode
 }) {
   return (
     <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
       <div>
         <div className="text-[10px] font-semibold uppercase tracking-wide text-mute">{kicker}</div>
         <h1 className="mt-1 text-[28px] font-semibold text-ink">{title}</h1>
-        <p className="mt-1 max-w-2xl text-[13px] text-mute">{note}</p>
+        <div className="mt-1 max-w-4xl space-y-2 text-[13px] leading-6 text-mute">{note}</div>
       </div>
       <ExportBtn />
+    </div>
+  )
+}
+
+export function Guide({
+  title,
+  lead,
+  items,
+}: {
+  title: string
+  lead?: string
+  items: { term: string; text: string }[]
+}) {
+  return (
+    <div className="mb-4 rounded-2xl border border-line bg-card p-4 sm:p-5">
+      <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
+      {lead && <p className="mt-2 text-[13px] leading-6 text-mute">{lead}</p>}
+      <dl className="mt-4 grid gap-3 md:grid-cols-2">
+        {items.map((item) => (
+          <div key={item.term} className="rounded-xl bg-paper px-3 py-2.5">
+            <dt className="text-[13px] font-semibold text-ink">{item.term}</dt>
+            <dd className="mt-1 text-[13px] leading-5 text-mute">{item.text}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   )
 }
@@ -127,11 +152,11 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
   )
 }
 
-export function H({ title, hint }: { title: string; hint?: string }) {
+export function H({ title, hint }: { title: string; hint?: ReactNode }) {
   return (
     <div className="mb-4">
       <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
-      {hint && <p className="mt-0.5 text-[12px] text-mute">{hint}</p>}
+      {hint && <div className="mt-0.5 max-w-4xl text-[12px] leading-5 text-mute">{hint}</div>}
     </div>
   )
 }
@@ -143,7 +168,7 @@ export function Banner({
   onAction,
 }: {
   title: string
-  body: string
+  body: ReactNode
   action?: string
   onAction?: () => void
 }) {
@@ -152,7 +177,7 @@ export function Banner({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[13px] font-semibold text-ink">{title}</div>
-          <p className="mt-1 max-w-3xl text-[12px] text-mute">{body}</p>
+          <div className="mt-1 max-w-4xl space-y-2 text-[13px] leading-6 text-mute">{body}</div>
         </div>
         {action && (
           <button

@@ -5,7 +5,6 @@ import {
   omcs,
   origins,
   regions,
-  reporteds,
   segments,
   useFilters,
   warehouseOpts,
@@ -36,10 +35,10 @@ const nav: { title: string; items: Item[] }[] = [
     ],
   },
   {
-    title: 'Contracts',
+    title: 'Facility Management',
     items: [
-      { to: '/contracts', label: 'FM Contracts', icon: ic.contracts },
-      { to: '/engineer', label: 'Engineer Cost', icon: ic.engineer, badge: '2' },
+      { to: '/contracts', label: 'FM contracts', icon: ic.contracts },
+      { to: '/engineer', label: 'Engineer cost', icon: ic.engineer, badge: '2' },
     ],
   },
   {
@@ -64,8 +63,8 @@ const crumbs: Record<string, [string, string]> = {
   '/orders': ['Performance', 'Order Book'],
   '/receivables': ['Cash & Stock', 'Receivables'],
   '/working-capital': ['Cash & Stock', 'Working Capital & Inventory'],
-  '/contracts': ['Contracts', 'FM Contracts'],
-  '/engineer': ['Contracts', 'Engineer Cost'],
+  '/contracts': ['Facility Management', 'FM contracts'],
+  '/engineer': ['Facility Management', 'Engineer cost'],
   '/variance': ['Control', 'Budget Variance'],
   '/ledger': ['Control', 'Ledger Exceptions'],
 }
@@ -112,7 +111,7 @@ const chipsByPath: Record<string, { key: keyof Filters; label: string }[]> = {
     { key: 'period', label: 'Period' },
     { key: 'region', label: 'Region' },
     { key: 'omc', label: 'Customer' },
-    { key: 'reported', label: 'Reported as' },
+    { key: 'reported', label: 'Booked as' },
     { key: 'currency', label: 'Currency' },
   ],
   '/engineer': [
@@ -147,7 +146,13 @@ function options(key: keyof Filters, periodOpts: { value: string; label: string 
   if (key === 'currency') return currencies.map((v) => ({ value: v, label: v === 'INR' ? 'INR ₹' : v === 'EUR' ? 'EUR €' : 'Both ₹ and €' }))
   if (key === 'warehouse') return warehouseOpts
   if (key === 'origin') return origins.map((v) => ({ value: v, label: v }))
-  if (key === 'reported') return reporteds.map((v) => ({ value: v, label: v === 'All' ? 'All reported as' : v }))
+  if (key === 'reported')
+    return [
+      { value: 'All', label: 'All booking flags' },
+      { value: 'FM', label: 'Facility Management' },
+      { value: 'Service', label: 'Booked as Service' },
+      { value: 'Provisional', label: 'Provisional — not yet confirmed' },
+    ]
   if (key === 'plant') return plantOpts.map((v) => ({ value: v, label: v === 'All' ? 'All plants' : v }))
   return []
 }
